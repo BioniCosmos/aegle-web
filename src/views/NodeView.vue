@@ -9,7 +9,6 @@ export interface Node {
   id?: string
   name: string
   apiAddress: string
-  apiPort: number
 }
 
 interface Inbound {
@@ -54,7 +53,6 @@ onMounted(async () => {
         <tr>
           <th scope="col">Name</th>
           <th scope="col">API address</th>
-          <th scope="col">API port</th>
           <th scope="col">Inbounds</th>
         </tr>
       </thead>
@@ -62,7 +60,6 @@ onMounted(async () => {
         <tr v-for="node in nodes" @click="toUpdateNode(node)">
           <td>{{ node.name }}</td>
           <td>{{ node.apiAddress }}</td>
-          <td>{{ node.apiPort }}</td>
           <td>
             <a v-for="inbound in inbounds.get(node.id!)">{{ inbound.name }}</a>
           </td>

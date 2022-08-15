@@ -15,7 +15,6 @@ const props = reactive({
 let data: Node = reactive({
   name: '',
   apiAddress: '',
-  apiPort: 0,
 })
 
 async function submit() {
@@ -66,10 +65,6 @@ if (isToInsertNode.value) {
     <div class="mb-3">
       <label for="api-address" class="form-label">API address</label>
       <input type="text" class="form-control" id="api-address" required v-model="data.apiAddress">
-    </div>
-    <div class="mb-3">
-      <label for="api-port" class="form-label">API port</label>
-      <input type="number" class="form-control" id="api-port" required v-model="data.apiPort">
     </div>
     <button class="btn btn-primary">Submit</button>
   </form>
