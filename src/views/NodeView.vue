@@ -18,9 +18,14 @@ interface Inbound {
 const router = useRouter()
 const nodes = ref<Node[]>([])
 const inbounds = ref<Map<string, Inbound[]>>(new Map())
+const { node: nodeStore, isToInsertNode } = storeToRefs(useNodeStore())
+
+async function toInsertNode() {
+  isToInsertNode.value = true
+  await router.push('/node')
+}
 
 async function toUpdateNode(node: Node) {
-  const { node: nodeStore, isToInsertNode } = storeToRefs(useNodeStore())
   nodeStore.value = node
   isToInsertNode.value = false
   await router.push('/node')
@@ -43,7 +48,7 @@ onMounted(async () => {
     <h1 class="h2">Nodes</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
       <div class="btn-group me-2">
-        <RouterLink to="/node" class="btn btn-outline-primary btn-sm">Add</RouterLink>
+        <button class="btn btn-outline-primary btn-sm" type="button" @click="toInsertNode">Add</button>
       </div>
     </div>
   </div>
