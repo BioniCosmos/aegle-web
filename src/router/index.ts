@@ -16,6 +16,10 @@ const router = createRouter({
       path: '/node',
       component: () => import('@/views/NodeEditorView.vue'),
     },
+    {
+      path: '/inbound',
+      component: () => import('@/views/InboundEditorView.vue'),
+    },
   ],
 })
 

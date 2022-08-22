@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useInboundStore } from '@/stores/inbound'
 import { useNodeStore } from '@/stores/node'
 import { transfer } from '@/utils'
 import { storeToRefs } from 'pinia'
@@ -11,8 +12,11 @@ export interface Node {
   apiAddress: string
 }
 
-interface Inbound {
+export interface Inbound {
+  id?: string
   name: string
+  data: string
+  nodeId: string
 }
 
 const router = useRouter()
@@ -31,11 +35,18 @@ async function toUpdateNode(node: Node) {
   await router.push('/node')
 }
 
+async function toInboundDetail(inbound: Inbound) {
+  const { inbound: inboundStore, isToInsertInbound } = storeToRefs(useInboundStore())
+  inboundStore.value = inbound
+  isToInsertInbound.value = false
+  await router.push('/inbound')
+}
+
 onMounted(async () => {
   try {
     nodes.value = await transfer(`/api/nodes?limit=5&skip=${0}`) as Node[]
     for (const node of nodes.value) {
-      inbounds.value.set(node.id!, await transfer(`/api/inbounds?nodeId=${node.id}`) as Node[])
+      inbounds.value.set(node.id!, await transfer(`/api/inbounds?nodeId=${node.id}`) as Inbound[])
     }
   } catch (err) {
     console.error(err)
@@ -53,7 +64,7 @@ onMounted(async () => {
     </div>
   </div>
   <div class="table-responsive">
-    <table class="table table-sm table-hover">
+    <table class="table table-sm table-hover align-middle">
       <thead>
         <tr>
           <th scope="col">Name</th>
@@ -66,7 +77,10 @@ onMounted(async () => {
           <td>{{ node.name }}</td>
           <td>{{ node.apiAddress }}</td>
           <td>
-            <a v-for="inbound in inbounds.get(node.id!)">{{ inbound.name }}</a>
+            <button class="btn btn-secondary btn-sm me-1" type="button" v-for="inbound in inbounds.get(node.id!)"
+              @click.stop="toInboundDetail(inbound)">{{
+                  inbound.name
+              }}</button>
           </td>
         </tr>
       </tbody>
