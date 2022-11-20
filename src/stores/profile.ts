@@ -53,15 +53,6 @@ export const useProfileStore = defineStore('profile', () => {
     }
   }
 
-  async function updateProfile() {
-    try {
-      await transfer(`/api/profile/${profile.value.id}`, 'PATCH', profile.value)
-      await router.push('/nodes')
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
   async function deleteProfile() {
     try {
       await transfer(`/api/profile/${profile.value.id}`, 'DELETE')
@@ -71,5 +62,5 @@ export const useProfileStore = defineStore('profile', () => {
     }
   }
 
-  return { profile, isToInsertProfile, toInsertProfile, toUpdateProfile, insertProfile, updateProfile, deleteProfile }
+  return { profile, isToInsertProfile, toInsertProfile, toUpdateProfile, insertProfile, deleteProfile }
 })

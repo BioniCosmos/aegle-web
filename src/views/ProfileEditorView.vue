@@ -12,9 +12,8 @@ defineEmits<{
 const router = useRouter()
 const profileStore = useProfileStore()
 const { profile, isToInsertProfile } = storeToRefs(profileStore)
-const { insertProfile, updateProfile, deleteProfile } = profileStore
+const { insertProfile, deleteProfile } = profileStore
 const title = computed(() => isToInsertProfile.value ? 'Adding a profile' : 'Editing a profile')
-const submit = computed(() => isToInsertProfile.value ? insertProfile : updateProfile)
 if (profile.value.nodeId === '') {
   router.replace('/nodes')
 }
@@ -30,10 +29,10 @@ if (profile.value.nodeId === '') {
       </div>
     </div>
   </div>
-  <form @submit.prevent="submit">
+  <form @submit.prevent="insertProfile">
     <div class="mb-3">
       <label for="name" class="form-label">Name</label>
-      <input type="text" class="form-control" id="name" required v-model="profile.name">
+      <input type="text" class="form-control" id="name" required v-model="profile.name" :disabled="!isToInsertProfile">
     </div>
     <div class="mb-3">
       <label for="data" class="form-label">Inbound configuration</label>
@@ -45,7 +44,7 @@ if (profile.value.nodeId === '') {
       <textarea class="form-control" id="data" rows="10" required v-model="profile.outbound"
         :disabled="!isToInsertProfile"></textarea>
     </div>
-    <button class="btn btn-primary">Submit</button>
+    <button class="btn btn-primary" v-if="isToInsertProfile">Submit</button>
   </form>
   <WarningDialogBox :name="profile.name" @delete="deleteProfile" />
 </template>
