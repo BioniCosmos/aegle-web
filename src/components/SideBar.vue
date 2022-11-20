@@ -19,10 +19,10 @@ import { RouterLink } from 'vue-router'
           </RouterLink>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">
+          <RouterLink class="nav-link" to="/users">
             <span data-feather="users" class="align-text-bottom"></span>
             Users
-          </a>
+          </RouterLink>
         </li>
       </ul>
     </div>

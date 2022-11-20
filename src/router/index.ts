@@ -10,15 +10,23 @@ const router = createRouter({
     },
     {
       path: '/nodes',
-      component: () => import('@/views/NodeView.vue')
+      component: () => import('@/views/Node/NodeView.vue'),
     },
     {
       path: '/node',
-      component: () => import('@/views/NodeEditorView.vue'),
+      component: () => import('@/views/Node/NodeEditorView.vue'),
     },
     {
-      path: '/inbound',
-      component: () => import('@/views/InboundEditorView.vue'),
+      path: '/profile',
+      component: () => import('@/views/ProfileEditorView.vue'),
+    },
+    {
+      path: '/users',
+      component: () => import('@/views/User/UserView.vue'),
+    },
+    {
+      path: '/user',
+      component: () => import('@/views/User/UserEditorView.vue'),
     },
   ],
 })
