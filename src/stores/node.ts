@@ -44,7 +44,7 @@ export const useNodeStore = defineStore('node', () => {
 
   async function updateNode() {
     try {
-      await transfer(`/api/node/${node.value.id}`, 'PATCH', node.value)
+      await transfer(`/api/node`, 'PUT', node.value)
       await router.push('/nodes')
     } catch (err) {
       console.error(err)
