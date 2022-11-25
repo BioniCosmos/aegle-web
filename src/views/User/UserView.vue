@@ -3,7 +3,7 @@ import type { Profile } from '@/stores/profile'
 import { useProfileStore } from '@/stores/profile'
 import type { User } from '@/stores/user'
 import { useUserStore } from '@/stores/user'
-import { transfer } from '@/utils'
+import { getDateString, transfer } from '@/utils'
 import { ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -25,7 +25,7 @@ watchEffect(async () => {
   }
 })
 </script>
-    
+
 <template>
   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">Users</h1>
@@ -42,6 +42,7 @@ watchEffect(async () => {
           <th scope="col">Name</th>
           <th scope="col">Email</th>
           <th scope="col">Level</th>
+          <th scope="col">Billing Date</th>
           <th scope="col">Profiles</th>
         </tr>
       </thead>
@@ -50,6 +51,7 @@ watchEffect(async () => {
           <td>{{ user.name }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.level }}</td>
+          <td>{{ getDateString(new Date(user.billingDate)) }}</td>
           <td>
             <button class="btn btn-secondary btn-sm me-1" type="button" v-for="profile in profiles.get(user.id)"
               :key="profile.id" @click.stop="toUpdateProfile(profile)">{{ profile.name }}</button>

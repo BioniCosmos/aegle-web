@@ -1,4 +1,4 @@
-import { transfer } from '@/utils'
+import { getDateString, transfer } from '@/utils'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -8,6 +8,7 @@ export interface User {
   name: string
   email: string
   level: number
+  billingDate: string
   account: Map<string, Account>
   profiles: Map<string, string>
 }
@@ -41,6 +42,7 @@ export const useUserStore = defineStore('user', () => {
     name: '',
     email: '',
     level: 0,
+    billingDate: getDateString(new Date()),
     account: new Map([
       ['vless', {}],
       ['vmess', {}],
@@ -57,6 +59,7 @@ export const useUserStore = defineStore('user', () => {
     user.value.name = ''
     user.value.email = ''
     user.value.level = 0
+    user.value.billingDate = getDateString(new Date())
     user.value.account = new Map([
       ['vless', {}],
       ['vmess', {}],
@@ -72,6 +75,7 @@ export const useUserStore = defineStore('user', () => {
     user.value.name = newUser.name
     user.value.email = newUser.email
     user.value.level = newUser.level
+    user.value.billingDate = getDateString(new Date(newUser.billingDate))
     user.value.account = new Map(Object.entries(newUser.account))
     user.value.profiles = new Map(Object.entries(newUser.profiles))
     isToInsertUser.value = false
@@ -85,6 +89,7 @@ export const useUserStore = defineStore('user', () => {
         name: user.value.name,
         email: user.value.email,
         level: user.value.level,
+        billingDate: new Date(user.value.billingDate).toISOString(),
         account: Object.fromEntries(user.value.account.entries()),
         profiles: Object.fromEntries(user.value.profiles.entries()),
       })

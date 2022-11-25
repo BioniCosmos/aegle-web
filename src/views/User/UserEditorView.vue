@@ -64,6 +64,11 @@ onMounted(async () => {
       <label for="level" class="form-label">Level</label>
       <input type="number" class="form-control" id="level" required v-model="user.level" :disabled="!isToInsertUser">
     </div>
+    <div class="mb-3">
+      <label for="billing-date" class="form-label">Billing Date</label>
+      <input type="date" class="form-control" id="billing-date" required v-model="user.billingDate"
+        :disabled="!isToInsertUser">
+    </div>
     <div class="mb-2 mt-4">VLESS</div>
     <div class="mb-3 row">
       <div class="col">

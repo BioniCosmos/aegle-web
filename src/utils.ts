@@ -17,3 +17,8 @@ export async function transfer(input: RequestInfo | URL, method: string = 'GET',
     throw new Error(`${resp.status} ${resp.statusText}: ${await resp.text()}`)
   }
 }
+
+export function getDateString(date: Date) {
+  const dateString = date.toISOString()
+  return dateString.slice(0, dateString.indexOf('T'))
+}
