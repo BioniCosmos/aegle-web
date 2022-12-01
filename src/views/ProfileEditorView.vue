@@ -36,7 +36,7 @@ if (profile.value.nodeId === '') {
     </div>
     <div class="mb-3">
       <label for="data" class="form-label">Inbound configuration</label>
-      <textarea class="form-control" id="data" rows="10" required v-model="profile.inbounds"
+      <textarea class="form-control" id="data" rows="10" required v-model="profile.inbound"
         :disabled="!isToInsertProfile"></textarea>
     </div>
     <div class="mb-3">

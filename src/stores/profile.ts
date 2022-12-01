@@ -6,16 +6,16 @@ import { useRouter } from 'vue-router'
 export interface Profile {
   id: string
   name: string
-  inbounds: any
+  inbound: any
   outbound: any
   nodeId: string
 }
 
 export const useProfileStore = defineStore('profile', () => {
-  const profile = ref({
+  const profile = ref<Profile>({
     id: '',
     name: '',
-    inbounds: '',
+    inbound: '',
     outbound: '',
     nodeId: '',
   })
@@ -26,7 +26,7 @@ export const useProfileStore = defineStore('profile', () => {
   async function toInsertProfile(nodeId: string) {
     profile.value.nodeId = nodeId
     profile.value.id = ''
-    profile.value.inbounds = ''
+    profile.value.inbound = ''
     profile.value.name = ''
     profile.value.outbound = ''
     isToInsertProfile.value = true
@@ -34,7 +34,7 @@ export const useProfileStore = defineStore('profile', () => {
   }
 
   async function toUpdateProfile(profile: Profile) {
-    profile.inbounds = JSON.stringify(profile.inbounds, null, 2)
+    profile.inbound = JSON.stringify(profile.inbound, null, 2)
     profile.outbound = JSON.stringify(profile.outbound, null, 2)
     useProfileStore().$patch({ profile })
     isToInsertProfile.value = false
@@ -44,7 +44,7 @@ export const useProfileStore = defineStore('profile', () => {
   async function insertProfile() {
     try {
       const profileClone = Object.assign({}, profile.value)
-      profileClone.inbounds = JSON.parse(profile.value.inbounds)
+      profileClone.inbound = JSON.parse(profile.value.inbound)
       profileClone.outbound = JSON.parse(profile.value.outbound)
       await transfer('/api/profile', 'POST', profileClone)
       await router.push('/nodes')
