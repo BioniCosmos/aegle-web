@@ -1,4 +1,4 @@
-import { getDateString, transfer } from '@/utils'
+import { getDateString, transfer, UTCTimeOffsets } from '@/utils'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -89,7 +89,7 @@ export const useUserStore = defineStore('user', () => {
         name: user.value.name,
         email: user.value.email,
         level: user.value.level,
-        billingDate: new Date(user.value.billingDate).toISOString(),
+        billingDate: new Date(`${user.value.billingDate}T00:00${UTCTimeOffsets(new Date())}`).toISOString(),
         account: Object.fromEntries(user.value.account.entries()),
         profiles: Object.fromEntries(user.value.profiles.entries()),
       })
