@@ -17,8 +17,15 @@ const page = ref(((page) => Number.isNaN(page) ? 1 : page)(Number(route.query['p
 watchEffect(async () => {
   try {
     users.value = await transfer(`/api/users?limit=10&skip=${(page.value - 1) * 10}`) as User[] ?? []
-    for (const user of users.value) {
-      profiles.value.set(user.id, await transfer(`/api/profiles?userId=${user.id}`) as Profile[])
+    const requests = users.value.map(user => transfer(`/api/profiles?userId=${user.id}`) as Promise<Array<Profile>>)
+    const responses = await Promise.allSettled(requests)
+    for (const [i, user] of users.value.entries()) {
+      const profile = responses[i]
+      if (profile.status === 'fulfilled') {
+        profiles.value.set(user.id, profile.value)
+      } else {
+        throw profile.reason
+      }
     }
   } catch (err) {
     console.error(err)
