@@ -34,30 +34,18 @@ export const useNodeStore = defineStore('node', () => {
   }
 
   async function insertNode() {
-    try {
-      await transfer('/api/node', 'POST', node.value)
-      await router.push('/nodes')
-    } catch (err) {
-      console.error(err)
-    }
+    await transfer('/api/node', 'POST', node.value)
+    await router.push('/nodes')
   }
 
   async function updateNode() {
-    try {
-      await transfer(`/api/node`, 'PUT', node.value)
-      await router.push('/nodes')
-    } catch (err) {
-      console.error(err)
-    }
+    await transfer(`/api/node`, 'PUT', node.value)
+    await router.push('/nodes')
   }
 
   async function deleteNode() {
-    try {
-      await transfer(`/api/node/${node.value.id}`, 'DELETE')
-      await router.push('/nodes')
-    } catch (err) {
-      console.error(err)
-    }
+    await transfer(`/api/node/${node.value.id}`, 'DELETE')
+    await router.push('/nodes')
   }
 
   return { node, isToInsertNode, toInsertNode, toUpdateNode, insertNode, updateNode, deleteNode }

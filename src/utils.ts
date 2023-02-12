@@ -6,16 +6,15 @@ export async function transfer(input: RequestInfo | URL, method: string = 'GET',
     },
     body: JSON.stringify(data),
   }
-  const resp = await fetch(input, init)
-  if (resp.ok || resp.status === 404) {
-    if (resp.status === 200) {
+  try {
+    const resp = await fetch(input, init)
+    if (resp.ok) {
       return resp.json()
-    } else {
-      return null
     }
-  } else {
-    throw new Error(`${resp.status} ${resp.statusText}: ${await resp.text()}`)
+  } catch (err) {
+    console.error(err)
   }
+  return null
 }
 
 export function getDateString(date: Date) {

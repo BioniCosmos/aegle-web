@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { CloudIcon, HomeIcon, UsersIcon } from '@zhuowenli/vue-feather-icons'
 import { RouterLink } from 'vue-router'
 </script>
 
@@ -8,19 +9,19 @@ import { RouterLink } from 'vue-router'
       <ul class="nav flex-column">
         <li class="nav-item">
           <RouterLink class="nav-link" to="/">
-            <span data-feather="home" class="align-text-bottom"></span>
+            <HomeIcon class="align-text-bottom" />
             Dashboard
           </RouterLink>
         </li>
         <li class="nav-item">
           <RouterLink class="nav-link" to="/nodes">
-            <span data-feather="cloud" class="align-text-bottom"></span>
+            <CloudIcon class="align-text-bottom" />
             Nodes
           </RouterLink>
         </li>
         <li class="nav-item">
           <RouterLink class="nav-link" to="/users">
-            <span data-feather="users" class="align-text-bottom"></span>
+            <UsersIcon class="align-text-bottom" />
             Users
           </RouterLink>
         </li>

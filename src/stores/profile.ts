@@ -42,24 +42,16 @@ export const useProfileStore = defineStore('profile', () => {
   }
 
   async function insertProfile() {
-    try {
-      const profileClone = Object.assign({}, profile.value)
-      profileClone.inbound = JSON.parse(profile.value.inbound)
-      profileClone.outbound = JSON.parse(profile.value.outbound)
-      await transfer('/api/profile', 'POST', profileClone)
-      await router.push('/nodes')
-    } catch (err) {
-      console.error(err)
-    }
+    const profileClone = Object.assign({}, profile.value)
+    profileClone.inbound = JSON.parse(profile.value.inbound)
+    profileClone.outbound = JSON.parse(profile.value.outbound)
+    await transfer('/api/profile', 'POST', profileClone)
+    await router.push('/nodes')
   }
 
   async function deleteProfile() {
-    try {
-      await transfer(`/api/profile/${profile.value.id}`, 'DELETE')
-      await router.push('/nodes')
-    } catch (err) {
-      console.error(err)
-    }
+    await transfer(`/api/profile/${profile.value.id}`, 'DELETE')
+    await router.push('/nodes')
   }
 
   return { profile, isToInsertProfile, toInsertProfile, toUpdateProfile, insertProfile, deleteProfile }

@@ -9,21 +9,12 @@ export interface Invoice {
 }
 
 export async function fetchInvoices() {
-  try {
-    return (await transfer('/api/invoices') as Array<Invoice>).map(value => ref(value))
-  } catch (err) {
-    console.log(err)
-    return null
-  }
+  return ((await transfer('/api/invoices') ?? new Array()) as Array<Invoice>).map(value => ref(value))
 }
 
 export async function extendBillingDate(invoice: Ref<Invoice>) {
-  try {
-    await transfer(`/api/invoice/${invoice.value.id}`, 'PATCH', {
-      billingDate: invoice.value.nextBillingDate
-    })
-  } catch (err) {
-    console.error(err)
-  }
+  await transfer(`/api/invoice/${invoice.value.id}`, 'PATCH', {
+    billingDate: invoice.value.nextBillingDate
+  })
   return fetchInvoices()
 }

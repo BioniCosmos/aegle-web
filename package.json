@@ -10,7 +10,7 @@
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "feather-icons": "^4.29.0",
+    "@zhuowenli/vue-feather-icons": "^5.0.2",
     "pinia": "^2.0.24",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6"

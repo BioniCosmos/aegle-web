@@ -5,7 +5,7 @@ specifiers:
   '@types/node': 18.11.9
   '@vitejs/plugin-vue': ^3.2.0
   '@vue/tsconfig': ^0.1.3
-  feather-icons: ^4.29.0
+  '@zhuowenli/vue-feather-icons': ^5.0.2
   npm-run-all: ^4.1.5
   pinia: ^2.0.24
   typescript: ~4.9.3
@@ -15,7 +15,7 @@ specifiers:
   vue-tsc: ^1.0.10
 
 dependencies:
-  feather-icons: 4.29.0
+  '@zhuowenli/vue-feather-icons': 5.0.2
   pinia: 2.0.24_mgnvym7yiazkylwwogi5r767ue
   vue: 3.2.45
   vue-router: 4.1.6_vue@3.2.45
@@ -220,6 +220,12 @@ packages:
       '@types/node': 18.11.9
     dev: true
 
+  /@zhuowenli/vue-feather-icons/5.0.2:
+    resolution: {integrity: sha512-a7rgGBZhhHUkgEa7pmhOSx6CxBGVsKDHxZnOgcHvFb0WHHvWWxmEFUQ3P2o8amImLYiYwTO2plPw5PLvP9vSRg==}
+    dependencies:
+      vue: 3.2.45
+    dev: false
+
   /ansi-styles/3.2.1:
     resolution: {integrity: sha512-VT0ZI6kZRdTh8YyJw3SMbYm/u+NqfsAxEpWO0Pf9sq8/e94WxxOpPKx9FR1FlyCtOVDNOQ+8ntlqFxiRc+r5qA==}
     engines: {node: '>=4'}
@@ -260,10 +266,6 @@ packages:
       supports-color: 5.5.0
     dev: true
 
-  /classnames/2.3.1:
-    resolution: {integrity: sha512-OlQdbZ7gLfGarSqxesMesDa5uz7KFbID8Kpq/SxIoNGDqY8lSYs0D+hhtBXhcdB3rcbXArFr7vlHheLk1voeNA==}
-    dev: false
-
   /color-convert/1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
     dependencies:
@@ -277,11 +279,6 @@ packages:
   /concat-map/0.0.1:
     resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
     dev: true
-
-  /core-js/3.24.1:
-    resolution: {integrity: sha512-0QTBSYSUZ6Gq21utGzkfITDylE8jWC9Ne1D2MrhvlsZBI1x39OdDIVbzSqtgMndIy6BlHxBXpMGqzZmnztg2rg==}
-    requiresBuild: true
-    dev: false
 
   /cross-spawn/6.0.5:
     resolution: {integrity: sha512-eTVLrBSt7fjbDygz805pMnstIs2VTBNkRm0qxZd+M7A5XDdxVRWO5MxGBXZhjY4cqLYLdtrGqRf8mBPmzwSpWQ==}
@@ -570,13 +567,6 @@ packages:
 
   /estree-walker/2.0.2:
     resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==}
-
-  /feather-icons/4.29.0:
-    resolution: {integrity: sha512-Y7VqN9FYb8KdaSF0qD1081HCkm0v4Eq/fpfQYQnubpqi0hXx14k+gF9iqtRys1SIcTEi97xDi/fmsPFZ8xo0GQ==}
-    dependencies:
-      classnames: 2.3.1
-      core-js: 3.24.1
-    dev: false
 
   /fsevents/2.3.2:
     resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}

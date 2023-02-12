@@ -50,7 +50,7 @@ body {
   color: #727272;
 }
 
-.sidebar .nav-link.router-link-active {
+.sidebar .nav-link.router-link-exact-active {
   color: #2470dc;
 }
 

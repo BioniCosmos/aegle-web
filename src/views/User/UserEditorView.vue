@@ -33,11 +33,7 @@ function updateProfiles(event: Event) {
 }
 
 onMounted(async () => {
-  try {
-    profiles.value = await transfer('/api/profiles') as Profile[] ?? []
-  } catch (err) {
-    console.error(err)
-  }
+  profiles.value = await transfer('/api/profiles') as Profile[] ?? []
 })
 </script>
 

@@ -83,40 +83,28 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function insertUser() {
-    try {
-      await transfer('/api/user', 'POST', {
-        id: user.value.id,
-        name: user.value.name,
-        email: user.value.email,
-        level: user.value.level,
-        billingDate: new Date(`${user.value.billingDate}T00:00${UTCTimeOffsets(new Date())}`).toISOString(),
-        account: Object.fromEntries(user.value.account.entries()),
-        profiles: Object.fromEntries(user.value.profiles.entries()),
-      })
-      await router.push('/users')
-    } catch (err) {
-      console.error(err)
-    }
+    await transfer('/api/user', 'POST', {
+      id: user.value.id,
+      name: user.value.name,
+      email: user.value.email,
+      level: user.value.level,
+      billingDate: new Date(`${user.value.billingDate}T00:00${UTCTimeOffsets(new Date())}`).toISOString(),
+      account: Object.fromEntries(user.value.account.entries()),
+      profiles: Object.fromEntries(user.value.profiles.entries()),
+    })
+    await router.push('/users')
   }
 
   async function deleteUser() {
-    try {
-      await transfer(`/api/user/${user.value.id}`, 'DELETE')
-      await router.push('/users')
-    } catch (err) {
-      console.error(err)
-    }
+    await transfer(`/api/user/${user.value.id}`, 'DELETE')
+    await router.push('/users')
   }
 
   async function updateUserProfile(operation: Operation, id: string) {
-    try {
-      await transfer(`/api/user/${user.value.id}`, 'PATCH', {
-        operation,
-        id,
-      })
-    } catch (err) {
-      console.error(err)
-    }
+    await transfer(`/api/user/${user.value.id}`, 'PATCH', {
+      operation,
+      id,
+    })
   }
 
   return { user, isToInsertUser, toInsertUser, toUpdateUser, insertUser, deleteUser, updateUserProfile }
