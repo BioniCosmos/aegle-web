@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BaseLayout from '@/components/BaseLayout.vue'
 import type { Node } from '@/stores/node'
 import { useNodeStore } from '@/stores/node'
 import type { Profile } from '@/stores/profile'
@@ -30,16 +31,16 @@ watchEffect(async () => {
 </script>
 
 <template>
-  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Nodes</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-      <div class="btn-group me-2">
-        <button class="btn btn-outline-primary btn-sm" type="button" @click="toInsertNode">Add</button>
-      </div>
-    </div>
-  </div>
-  <div class="table-responsive">
-    <table class="table table-sm table-hover align-middle">
+  <BaseLayout>
+    <template #title>
+      <h2 class="mb-0">Nodes</h2>
+    </template>
+    <template #operations>
+      <li>
+        <a href="#" role="button" @click="toInsertNode">Add</a>
+      </li>
+    </template>
+    <table>
       <thead>
         <tr>
           <th scope="col">Name</th>
@@ -52,20 +53,21 @@ watchEffect(async () => {
           <td>{{ node.name }}</td>
           <td>{{ node.apiAddress }}</td>
           <td>
-            <button class="btn btn-secondary btn-sm me-1" type="button" v-for="profile in profiles.get(node.id)"
-              :key="profile.id" @click.stop="toUpdateProfile(profile)">{{ profile.name }}</button>
+            <button type="button" v-for="profile in profiles.get(node.id)" :key="profile.id"
+              @click.stop="toUpdateProfile(profile)">{{
+                profile.name }}</button>
           </td>
         </tr>
       </tbody>
     </table>
-  </div>
+  </BaseLayout>
   <nav>
-    <ul class="pagination justify-content-center">
-      <li class="page-item" :class="page <= 1 ? 'disabled' : ''">
-        <a class="page-link" @click="page--">Previous</a>
+    <ul>
+      <li :class="page <= 1 ? 'disabled' : ''">
+        <a @click="page--">Previous</a>
       </li>
-      <li class="page-item">
-        <a class="page-link" @click="page++">Next</a>
+      <li>
+        <a @click="page++">Next</a>
       </li>
     </ul>
   </nav>

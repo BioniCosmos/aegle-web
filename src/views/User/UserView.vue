@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BaseLayout from '@/components/BaseLayout.vue'
 import type { Profile } from '@/stores/profile'
 import { useProfileStore } from '@/stores/profile'
 import type { User } from '@/stores/user'
@@ -30,16 +31,16 @@ watchEffect(async () => {
 </script>
 
 <template>
-  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Users</h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-      <div class="btn-group me-2">
-        <button class="btn btn-outline-primary btn-sm" type="button" @click="toInsertUser">Add</button>
-      </div>
-    </div>
-  </div>
-  <div class="table-responsive">
-    <table class="table table-sm table-hover align-middle">
+  <BaseLayout>
+    <template #title>
+      <h2 class="mb-0">Users</h2>
+    </template>
+    <template #operations>
+      <li>
+        <a href="#" role="button" @click="toInsertUser">Add</a>
+      </li>
+    </template>
+    <table>
       <thead>
         <tr>
           <th scope="col">Name</th>
@@ -56,11 +57,11 @@ watchEffect(async () => {
           <td>{{ user.level }}</td>
           <td>{{ getDateString(new Date(user.billingDate)) }}</td>
           <td>
-            <button class="btn btn-secondary btn-sm me-1" type="button" v-for="profile in profiles.get(user.id)"
-              :key="profile.id" @click.stop="toUpdateProfile(profile)">{{ profile.name }}</button>
+            <button type="button" v-for="profile in profiles.get(user.id)" :key="profile.id"
+              @click.stop="toUpdateProfile(profile)">{{ profile.name }}</button>
           </td>
         </tr>
       </tbody>
     </table>
-  </div>
+  </BaseLayout>
 </template>

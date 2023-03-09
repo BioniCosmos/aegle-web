@@ -9,33 +9,26 @@ const router = useRouter()
 
 async function signIn() {
   await accountStore.signIn()
-  router.push('/')
+  await router.push('/')
 }
 </script>
 
 <template>
-  <main class="form-signin w-100 m-auto">
-    <form @submit.prevent="signIn">
-      <h1 class="h3 mb-3 fw-normal">Witch Network</h1>
-      <div class="form-floating">
-        <input type="text" class="form-control" id="floatingInput" placeholder="Username" v-model="account.username">
-        <label for="floatingInput">Username</label>
-      </div>
-      <div class="form-floating">
-        <input type="password" class="form-control" id="floatingPassword" placeholder="Password"
+  <div class="h-[calc(100vh-4.25rem)] flex justify-center items-center">
+    <article class="grid">
+      <form class="mb-0" @submit.prevent="signIn">
+        <input type="text" placeholder="Username" aria-label="Username" autocomplete="nickname" required
+          v-model="account.username">
+        <input type="password" placeholder="Password" aria-label="Password" autocomplete="current-password" required
           v-model="account.password">
-        <label for="floatingPassword">Password</label>
-      </div>
-      <div class="checkbox mb-3">
-        <label>
-          <input type="checkbox" value="remember-me"> Remember me
-        </label>
-      </div>
-      <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in / Sign up</button>
-    </form>
-  </main>
+        <fieldset>
+          <label for="remember">
+            <input type="checkbox" role="switch" id="remember">
+            Remember me
+          </label>
+        </fieldset>
+        <button class="contrast mb-0">Sign in</button>
+      </form>
+    </article>
+  </div>
 </template>
-
-<style scoped src="@/assets/css/sign-in.css">
-
-</style>

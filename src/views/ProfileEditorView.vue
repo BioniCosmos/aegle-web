@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import BaseLayout from '@/components/BaseLayout.vue'
 import WarningDialogBox from '@/components/WarningDialogBox.vue'
 import { useProfileStore } from '@/stores/profile'
 import { storeToRefs } from 'pinia'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 defineEmits<{
   (event: 'delete'): void
+  (event: 'close'): void
 }>()
 
 const router = useRouter()
@@ -17,34 +19,34 @@ const title = computed(() => isToInsertProfile.value ? 'Adding a profile' : 'Edi
 if (profile.value.nodeId === '') {
   router.replace('/nodes')
 }
+const isOpen = ref(false)
 </script>
 
 <template>
-  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">{{ title }}</h1>
-    <div class="btn-toolbar mb-2 mb-md-0" v-if="!isToInsertProfile">
-      <div class="btn-group me-2">
-        <button class="btn btn-outline-danger btn-sm" type="button" data-bs-toggle="modal"
-          data-bs-target="#warning-dialog-box">Remove the profile</button>
-      </div>
-    </div>
-  </div>
-  <form @submit.prevent="insertProfile">
-    <div class="mb-3">
-      <label for="name" class="form-label">Name</label>
-      <input type="text" class="form-control" id="name" required v-model="profile.name" :disabled="!isToInsertProfile">
-    </div>
-    <div class="mb-3">
-      <label for="data" class="form-label">Inbound configuration</label>
-      <textarea class="form-control" id="data" rows="10" required v-model="profile.inbound"
-        :disabled="!isToInsertProfile"></textarea>
-    </div>
-    <div class="mb-3">
-      <label for="data" class="form-label">Outbound configuration</label>
-      <textarea class="form-control" id="data" rows="10" required v-model="profile.outbound"
-        :disabled="!isToInsertProfile"></textarea>
-    </div>
-    <button class="btn btn-primary" v-if="isToInsertProfile">Submit</button>
-  </form>
-  <WarningDialogBox :name="profile.name" @delete="deleteProfile" />
+  <BaseLayout>
+    <template #title>
+      <h3 class="mb-0">{{ title }}</h3>
+    </template>
+    <template #operations v-if="!isToInsertProfile">
+      <li>
+        <a href="#" role="button" @click="isOpen = true">Remove the profile</a>
+      </li>
+    </template>
+    <form @submit.prevent="insertProfile">
+      <label for="name">
+        Name
+        <input type="text" id="name" required v-model="profile.name" :readonly="!isToInsertProfile">
+      </label>
+      <label for="data">
+        Inbound configuration
+        <textarea id="data" rows="10" required v-model="profile.inbound" :readonly="!isToInsertProfile"></textarea>
+      </label>
+      <label for="data">
+        Outbound configuration
+        <textarea id="data" rows="10" required v-model="profile.outbound" :readonly="!isToInsertProfile"></textarea>
+      </label>
+      <button v-if="isToInsertProfile">Submit</button>
+    </form>
+  </BaseLayout>
+  <WarningDialogBox :name="profile.name" :is-open="isOpen" @delete="deleteProfile" @close="isOpen = false" />
 </template>

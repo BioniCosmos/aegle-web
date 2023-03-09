@@ -22,6 +22,6 @@ export function getDateString(date: Date) {
 }
 
 export function UTCTimeOffsets(date: Date) {
-  const timeZone = (-new Date().getTimezoneOffset() / 60)
+  const timeZone = (-date.getTimezoneOffset() / 60)
   return `${timeZone > 0 ? '+' : ''}${timeZone.toString().padStart(2, '0')}:00`
 }

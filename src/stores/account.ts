@@ -19,5 +19,9 @@ export const useAccountStore = defineStore('account', () => {
     await transfer('/api/account/sign-in', 'POST', account.value)
   }
 
-  return { account, isAuthorized, authorize, signIn }
+  async function signOut() {
+    await transfer('/api/account/sign-out', 'POST')
+  }
+
+  return { account, isAuthorized, authorize, signIn, signOut }
 })

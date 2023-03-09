@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BaseLayout from '@/components/BaseLayout.vue'
 import { extendBillingDate, fetchInvoices, type Invoice } from '@/stores/invoice'
 import { getDateString } from '@/utils'
 import { onMounted, ref, type Ref } from 'vue'
@@ -21,16 +22,16 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Dashboard</h1>
-  </div>
-  <h2>Invoices</h2>
-  <div class="table-responsive">
-    <table class="table table-striped table-sm">
+  <BaseLayout>
+    <template #title>
+      <h2 class="mb-0">Invoices</h2>
+    </template>
+    <table>
       <thead>
         <tr>
           <th scope="col">Name</th>
           <th scope="col">Next Billing Date</th>
+          <th scope="col">Extend</th>
         </tr>
       </thead>
       <tbody>
@@ -38,10 +39,11 @@ onMounted(async () => {
           :style="{ backgroundColor: invoice.value.isPaid ? 'unset' : 'red' }">
           <td>{{ invoice.value.name }}</td>
           <td>{{ getDateString(new Date(invoice.value.nextBillingDate)) }}</td>
-          <td><button type="button" class="btn btn-secondary btn-sm" @click="submit(invoice)">Extend</button>
+          <td>
+            <button type="button" @click="submit(invoice)">Extend</button>
           </td>
         </tr>
       </tbody>
     </table>
-  </div>
+  </BaseLayout>
 </template>

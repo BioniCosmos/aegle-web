@@ -1,25 +1,47 @@
 <script setup lang="ts">
-defineProps<{
+import { ref, watch } from 'vue'
+
+const props = defineProps<{
   name: string
+  isOpen: boolean
 }>()
+const realOpen = ref(false)
+
+watch(() => props.isOpen, (isOpen) => {
+  const isOpenClass = 'modal-is-open'
+  const openingClass = 'modal-is-opening'
+  const closingClass = 'modal-is-closing'
+  const animationDuration = 400
+  if (isOpen) {
+    document.documentElement.classList.add(isOpenClass, openingClass)
+    setTimeout(() => {
+      document.documentElement.classList.remove(openingClass)
+    }, animationDuration)
+    realOpen.value = true
+  } else {
+    document.documentElement.classList.add(closingClass)
+    setTimeout(() => {
+      document.documentElement.classList.remove(closingClass, isOpenClass)
+      realOpen.value = false
+    }, animationDuration)
+  }
+})
 </script>
 
 <template>
-  <div class="modal fade" id="warning-dialog-box" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Warning!</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          Are you sure to remove <strong>{{ name }}</strong>?
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @click="$emit('delete')">Yes</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <dialog :open="realOpen">
+    <article>
+      <a href="#" aria-label="Close" class="close" @click="$emit('close')"></a>
+      <h3>Warning!</h3>
+      <p>Are you sure to remove <b>{{ name }}</b>?</p>
+      <footer>
+        <a href="#" role="button" class="secondary" @click="$emit('close')">
+          No
+        </a>
+        <a href="#" role="button" @click="$emit('delete'); $emit('close')">
+          Yes
+        </a>
+      </footer>
+    </article>
+  </dialog>
 </template>
