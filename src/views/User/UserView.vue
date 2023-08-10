@@ -13,11 +13,19 @@ const { toUpdateProfile } = useProfileStore()
 const { toInsertUser, toUpdateUser } = useUserStore()
 const users = ref<User[]>([])
 const profiles = ref(new Map<string, Profile[]>())
-const page = ref(((page) => Number.isNaN(page) ? 1 : page)(Number(route.query['page'])))
+const page = ref(
+  ((page) => (Number.isNaN(page) ? 1 : page))(Number(route.query['page']))
+)
 
 watchEffect(async () => {
-  users.value = await transfer(`/api/users?limit=10&skip=${(page.value - 1) * 10}`) as User[] ?? []
-  const requests = users.value.map(user => transfer(`/api/profiles?userId=${user.id}`) as Promise<Array<Profile>>)
+  users.value =
+    ((await transfer(
+      `/api/users?limit=10&skip=${(page.value - 1) * 10}`
+    )) as User[]) ?? []
+  const requests = users.value.map(
+    (user) =>
+      transfer(`/api/profiles?userId=${user.id}`) as Promise<Array<Profile>>
+  )
   const responses = await Promise.allSettled(requests)
   for (const [i, user] of users.value.entries()) {
     const profile = responses[i]
@@ -55,10 +63,16 @@ watchEffect(async () => {
           <td>{{ user.name }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.level }}</td>
-          <td>{{ getDateString(new Date(user.billingDate)) }}</td>
+          <td>{{ getDateString(user.billingDate) }}</td>
           <td>
-            <button type="button" v-for="profile in profiles.get(user.id)" :key="profile.id"
-              @click.stop="toUpdateProfile(profile)">{{ profile.name }}</button>
+            <button
+              type="button"
+              v-for="profile in profiles.get(user.id)"
+              :key="profile.id"
+              @click.stop="toUpdateProfile(profile)"
+            >
+              {{ profile.name }}
+            </button>
           </td>
         </tr>
       </tbody>

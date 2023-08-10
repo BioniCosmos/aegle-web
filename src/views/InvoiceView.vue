@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import BaseLayout from '@/components/BaseLayout.vue'
-import { extendBillingDate, fetchInvoices, type Invoice } from '@/stores/invoice'
+import {
+  extendBillingDate,
+  fetchInvoices,
+  type Invoice,
+} from '@/stores/invoice'
 import { getDateString } from '@/utils'
 import { onMounted, ref, type Ref } from 'vue'
 
@@ -35,10 +39,13 @@ onMounted(async () => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="invoice in invoices" :key="invoice.value.id"
-          :style="{ backgroundColor: invoice.value.isPaid ? 'unset' : 'red' }">
+        <tr
+          v-for="invoice in invoices"
+          :key="invoice.value.id"
+          :style="{ backgroundColor: invoice.value.isPaid ? 'unset' : 'red' }"
+        >
           <td>{{ invoice.value.name }}</td>
-          <td>{{ getDateString(new Date(invoice.value.nextBillingDate)) }}</td>
+          <td>{{ getDateString(invoice.value.nextBillingDate) }}</td>
           <td>
             <button type="button" @click="submit(invoice)">Extend</button>
           </td>

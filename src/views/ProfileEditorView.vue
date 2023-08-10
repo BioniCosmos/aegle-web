@@ -15,7 +15,9 @@ const router = useRouter()
 const profileStore = useProfileStore()
 const { profile, isToInsertProfile } = storeToRefs(profileStore)
 const { insertProfile, deleteProfile } = profileStore
-const title = computed(() => isToInsertProfile.value ? 'Adding a profile' : 'Editing a profile')
+const title = computed(() =>
+  isToInsertProfile.value ? 'Adding a profile' : 'Editing a profile'
+)
 if (profile.value.nodeId === '') {
   router.replace('/nodes')
 }
@@ -35,18 +37,41 @@ const isOpen = ref(false)
     <form @submit.prevent="insertProfile">
       <label for="name">
         Name
-        <input type="text" id="name" required v-model="profile.name" :readonly="!isToInsertProfile">
+        <input
+          type="text"
+          id="name"
+          required
+          v-model="profile.name"
+          :readonly="!isToInsertProfile"
+        />
       </label>
-      <label for="data">
+      <label for="inbound">
         Inbound configuration
-        <textarea id="data" rows="10" required v-model="profile.inbound" :readonly="!isToInsertProfile"></textarea>
+        <textarea
+          id="inbound"
+          rows="10"
+          required
+          v-model="profile.inbound"
+          :readonly="!isToInsertProfile"
+        ></textarea>
       </label>
-      <label for="data">
+      <label for="outbound">
         Outbound configuration
-        <textarea id="data" rows="10" required v-model="profile.outbound" :readonly="!isToInsertProfile"></textarea>
+        <textarea
+          id="outbound"
+          rows="10"
+          required
+          v-model="profile.outbound"
+          :readonly="!isToInsertProfile"
+        ></textarea>
       </label>
       <button v-if="isToInsertProfile">Submit</button>
     </form>
   </BaseLayout>
-  <WarningDialogBox :name="profile.name" :is-open="isOpen" @delete="deleteProfile" @close="isOpen = false" />
+  <WarningDialogBox
+    :name="profile.name"
+    :is-open="isOpen"
+    @delete="deleteProfile"
+    @close="isOpen = false"
+  />
 </template>

@@ -1,6 +1,6 @@
 import { getDateString, transfer, UTCTimeOffsets } from '@/utils'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 export interface User {
@@ -9,26 +9,29 @@ export interface User {
   email: string
   level: number
   billingDate: string
-  account: Map<string, Account>
+  account: Account
   profiles: Map<string, string>
 }
 
-type Account = VLESSAccount & VMessAccount & TrojanAccount
+interface Account {
+  vless: VLESSAccount
+  vmess: VMessAccount
+  trojan: TrojanAccount
+}
 
 interface VLESSAccount {
-  id?: string
-  flow?: string
-  encryption?: string
+  id: string
+  flow: string
+  encryption: string
 }
 
 interface VMessAccount {
-  id?: string
-  security?: string
+  id: string
+  security: string
 }
 
 interface TrojanAccount {
-  password?: string
-  flow?: string
+  password: string
 }
 
 export enum Operation {
@@ -36,60 +39,61 @@ export enum Operation {
   Remove,
 }
 
+const newUser = (): User => {
+  const user = JSON.parse(
+    JSON.stringify({
+      id: '',
+      name: '',
+      email: '',
+      level: 0,
+      billingDate: '',
+      account: {
+        vless: { id: '', flow: '', encryption: '' },
+        vmess: { id: '', security: '' },
+        trojan: { password: '' },
+      },
+    })
+  )
+  user.profiles = new Map()
+  return user
+}
+
 export const useUserStore = defineStore('user', () => {
-  const user = ref<User>({
-    id: '',
-    name: '',
-    email: '',
-    level: 0,
-    billingDate: getDateString(new Date()),
-    account: new Map([
-      ['vless', {}],
-      ['vmess', {}],
-      ['trojan', {}],
-    ]),
-    profiles: new Map(),
-  })
+  const user = ref<User>(newUser())
   const isToInsertUser = ref(true)
+
+  const billingDate = computed({
+    get: () => getDateString(user.value.billingDate),
+    set: (newDate) => {
+      user.value.billingDate =
+        newDate !== ''
+          ? new Date(
+              `${newDate}T00:00${UTCTimeOffsets(new Date())}`
+            ).toISOString()
+          : ''
+    },
+  })
 
   const router = useRouter()
 
   async function toInsertUser() {
-    user.value.id = ''
-    user.value.name = ''
-    user.value.email = ''
-    user.value.level = 0
-    user.value.billingDate = getDateString(new Date())
-    user.value.account = new Map([
-      ['vless', {}],
-      ['vmess', {}],
-      ['trojan', {}],
-    ])
-    user.value.profiles = new Map()
+    user.value = newUser()
     isToInsertUser.value = true
     await router.push('/user')
   }
 
-  async function toUpdateUser(newUser: User) {
-    user.value.id = newUser.id
-    user.value.name = newUser.name
-    user.value.email = newUser.email
-    user.value.level = newUser.level
-    user.value.billingDate = getDateString(new Date(newUser.billingDate))
-    user.value.account = new Map(Object.entries(newUser.account))
-    user.value.profiles = new Map(Object.entries(newUser.profiles))
+  async function toUpdateUser(updatedUser: User) {
+    user.value = {
+      ...updatedUser,
+      profiles: new Map(Object.entries(updatedUser.profiles)),
+    }
     isToInsertUser.value = false
     await router.push('/user')
   }
 
   async function insertUser() {
     await transfer('/api/user', 'POST', {
-      id: user.value.id,
-      name: user.value.name,
-      email: user.value.email,
-      level: user.value.level,
-      billingDate: new Date(`${user.value.billingDate}T00:00${UTCTimeOffsets(new Date())}`).toISOString(),
-      account: Object.fromEntries(user.value.account.entries()),
+      ...user.value,
       profiles: Object.fromEntries(user.value.profiles.entries()),
     })
     await router.push('/users')
@@ -107,5 +111,14 @@ export const useUserStore = defineStore('user', () => {
     })
   }
 
-  return { user, isToInsertUser, toInsertUser, toUpdateUser, insertUser, deleteUser, updateUserProfile }
+  return {
+    user,
+    isToInsertUser,
+    billingDate,
+    toInsertUser,
+    toUpdateUser,
+    insertUser,
+    deleteUser,
+    updateUserProfile,
+  }
 })

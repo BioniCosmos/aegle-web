@@ -1,4 +1,8 @@
-export async function transfer(input: RequestInfo | URL, method: string = 'GET', data?: unknown): Promise<unknown> {
+export async function transfer(
+  input: RequestInfo | URL,
+  method: string = 'GET',
+  data?: unknown
+): Promise<unknown> {
   const init: RequestInit = {
     method,
     headers: {
@@ -17,11 +21,22 @@ export async function transfer(input: RequestInfo | URL, method: string = 'GET',
   return null
 }
 
-export function getDateString(date: Date) {
-  return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+export function getDateString(date: Date | string) {
+  if (typeof date === 'string') {
+    if (date === '') {
+      return ''
+    }
+    date = new Date(date)
+  }
+  return `${date.getFullYear()}-${(date.getMonth() + 1)
+    .toString()
+    .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
 }
 
 export function UTCTimeOffsets(date: Date) {
-  const timeZone = (-date.getTimezoneOffset() / 60)
+  if (typeof date === 'string') {
+    date = new Date(date)
+  }
+  const timeZone = -date.getTimezoneOffset() / 60
   return `${timeZone > 0 ? '+' : ''}${timeZone.toString().padStart(2, '0')}:00`
 }
