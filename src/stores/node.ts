@@ -1,4 +1,5 @@
 import { transfer } from '@/utils'
+import { createDiscreteApi } from 'naive-ui'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -48,5 +49,31 @@ export const useNodeStore = defineStore('node', () => {
     await router.push('/nodes')
   }
 
-  return { node, isToInsertNode, toInsertNode, toUpdateNode, insertNode, updateNode, deleteNode }
+  async function resetNode() {
+    const res = await transfer<{ code: number; message: string }>(
+      `/api/node/${node.value.id}/reset`,
+      'POST'
+    )
+    const { message } = createDiscreteApi(['message'])
+
+    if (res === null) {
+      return
+    }
+    if (typeof res === 'string') {
+      message.error(res)
+      return
+    }
+    message.success(res.message)
+  }
+
+  return {
+    node,
+    isToInsertNode,
+    toInsertNode,
+    toUpdateNode,
+    insertNode,
+    updateNode,
+    deleteNode,
+    resetNode,
+  }
 })

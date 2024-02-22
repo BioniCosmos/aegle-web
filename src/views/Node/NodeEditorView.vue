@@ -13,10 +13,12 @@ defineEmits<{
 
 const nodeStore = useNodeStore()
 const { node, isToInsertNode } = storeToRefs(nodeStore)
-const { insertNode, updateNode, deleteNode } = nodeStore
+const { insertNode, updateNode, deleteNode, resetNode } = nodeStore
 const { toInsertProfile } = useProfileStore()
-const submit = computed(() => isToInsertNode.value ? insertNode : updateNode)
-const title = computed(() => isToInsertNode.value ? 'Adding a node' : 'Editing a node')
+const submit = computed(() => (isToInsertNode.value ? insertNode : updateNode))
+const title = computed(() =>
+  isToInsertNode.value ? 'Adding a node' : 'Editing a node'
+)
 const isOpen = ref(false)
 </script>
 
@@ -27,7 +29,12 @@ const isOpen = ref(false)
     </template>
     <template #operations v-if="!isToInsertNode">
       <li>
-        <a href="#" role="button" @click="toInsertProfile(node.id)">Add a profile</a>
+        <a href="#" role="button" @click="toInsertProfile(node.id)"
+          >Add a profile</a
+        >
+      </li>
+      <li>
+        <a href="#" role="button" @click="resetNode">Reset the node</a>
       </li>
       <li>
         <a href="#" role="button" @click="isOpen = true">Remove the node</a>
@@ -36,14 +43,24 @@ const isOpen = ref(false)
     <form @submit.prevent="submit">
       <label for="name">
         Name
-        <input type="text" id="name" required v-model="node.name">
+        <input type="text" id="name" required v-model="node.name" />
       </label>
       <label for="api-address">
         API address
-        <input type="text" id="api-address" required v-model="node.apiAddress">
+        <input
+          type="text"
+          id="api-address"
+          required
+          v-model="node.apiAddress"
+        />
       </label>
       <button>Submit</button>
     </form>
   </BaseLayout>
-  <WarningDialogBox :name="node.name" :is-open="isOpen" @delete="deleteNode" @close="isOpen = false" />
+  <WarningDialogBox
+    :name="node.name"
+    :is-open="isOpen"
+    @delete="deleteNode"
+    @close="isOpen = false"
+  />
 </template>

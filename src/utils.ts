@@ -1,24 +1,25 @@
-export async function transfer(
+export async function transfer<T>(
   input: RequestInfo | URL,
   method: string = 'GET',
   data?: unknown
-): Promise<unknown> {
+) {
   const init: RequestInit = {
     method,
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json; charset=utf-8',
     },
     body: JSON.stringify(data),
   }
   try {
     const resp = await fetch(input, init)
     if (resp.ok) {
-      return resp.json()
+      return resp.json() as Promise<T>
     }
+    return resp.text()
   } catch (err) {
     console.error(err)
+    return null
   }
-  return null
 }
 
 export function getDateString(date: Date | string) {
