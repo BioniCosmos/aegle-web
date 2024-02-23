@@ -12,7 +12,8 @@ export const useAccountStore = defineStore('account', () => {
   const isAuthorized = ref(false)
 
   async function authorize() {
-    isAuthorized.value = await transfer('/api/account/sign-in', 'POST') !== null
+    const res = await transfer('/api/account/sign-in', 'POST')
+    isAuthorized.value = res !== null && typeof res !== 'string'
   }
 
   async function signIn() {

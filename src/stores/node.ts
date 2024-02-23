@@ -50,10 +50,7 @@ export const useNodeStore = defineStore('node', () => {
   }
 
   async function resetNode() {
-    const res = await transfer<{ code: number; message: string }>(
-      `/api/node/${node.value.id}/reset`,
-      'POST'
-    )
+    const res = await transfer(`/api/node/${node.value.id}/reset`, 'POST')
     const { message } = createDiscreteApi(['message'])
 
     if (res === null) {

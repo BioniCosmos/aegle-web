@@ -1,4 +1,9 @@
-export async function transfer<T>(
+export interface DefaultResponse {
+  code: number
+  message: string
+}
+
+export async function transfer<T = DefaultResponse>(
   input: RequestInfo | URL,
   method: string = 'GET',
   data?: unknown

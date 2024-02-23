@@ -2,6 +2,7 @@ import { getDateString, transfer, UTCTimeOffsets } from '@/utils'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import type { Profile } from './profile'
 
 export interface User {
   id: string
@@ -37,6 +38,11 @@ interface TrojanAccount {
 export enum Operation {
   Add,
   Remove,
+}
+
+export interface UserResponse {
+  user: User
+  profiles: Profile[]
 }
 
 const newUser = (): User => {

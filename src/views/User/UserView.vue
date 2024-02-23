@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import BaseLayout from '@/components/BaseLayout.vue'
-import type { Profile } from '@/stores/profile'
 import { useProfileStore } from '@/stores/profile'
-import type { User } from '@/stores/user'
+import type { UserResponse } from '@/stores/user'
 import { useUserStore } from '@/stores/user'
 import { getDateString, transfer } from '@/utils'
 import { ref, watchEffect } from 'vue'
@@ -11,30 +10,16 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const { toUpdateProfile } = useProfileStore()
 const { toInsertUser, toUpdateUser } = useUserStore()
-const users = ref<User[]>([])
-const profiles = ref(new Map<string, Profile[]>())
+const users = ref<UserResponse[]>([])
 const page = ref(
   ((page) => (Number.isNaN(page) ? 1 : page))(Number(route.query['page']))
 )
 
 watchEffect(async () => {
-  users.value =
-    ((await transfer(
-      `/api/users?limit=10&skip=${(page.value - 1) * 10}`
-    )) as User[]) ?? []
-  const requests = users.value.map(
-    (user) =>
-      transfer(`/api/profiles?userId=${user.id}`) as Promise<Array<Profile>>
+  const res = await transfer<UserResponse[]>(
+    `/api/users?limit=10&skip=${(page.value - 1) * 10}`
   )
-  const responses = await Promise.allSettled(requests)
-  for (const [i, user] of users.value.entries()) {
-    const profile = responses[i]
-    if (profile.status === 'fulfilled') {
-      profiles.value.set(user.id, profile.value)
-    } else {
-      console.error(profile.reason)
-    }
-  }
+  users.value = res !== null && typeof res !== 'string' ? res : []
 })
 </script>
 
@@ -59,7 +44,11 @@ watchEffect(async () => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in users" :key="user.id" @click="toUpdateUser(user)">
+        <tr
+          v-for="{ user, profiles } in users"
+          :key="user.id"
+          @click="toUpdateUser(user)"
+        >
           <td>{{ user.name }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.level }}</td>
@@ -67,7 +56,7 @@ watchEffect(async () => {
           <td>
             <button
               type="button"
-              v-for="profile in profiles.get(user.id)"
+              v-for="profile in profiles"
               :key="profile.id"
               @click.stop="toUpdateProfile(profile)"
             >
