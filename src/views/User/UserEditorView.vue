@@ -48,6 +48,11 @@ onMounted(async () => {
     </template>
     <template #operations v-if="!isToInsertUser">
       <li>
+        <a :href="`/api/user/${user.id}/sub`" role="button" target="_blank"
+          >Subscription link</a
+        >
+      </li>
+      <li>
         <a href="#" role="button" @click="isOpen = true">Remove the user</a>
       </li>
     </template>
