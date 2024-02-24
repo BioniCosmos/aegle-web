@@ -1,8 +1,8 @@
 import { transfer } from '@/utils'
-import { createDiscreteApi } from 'naive-ui'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { message } from './common'
 
 export interface Node {
   id: string
@@ -51,8 +51,6 @@ export const useNodeStore = defineStore('node', () => {
 
   async function resetNode() {
     const res = await transfer(`/api/node/${node.value.id}/reset`, 'POST')
-    const { message } = createDiscreteApi(['message'])
-
     if (res === null) {
       return
     }
