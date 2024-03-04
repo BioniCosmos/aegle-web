@@ -3,11 +3,17 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { message } from './common'
+import type { Profile } from './profile'
 
 export interface Node {
   id: string
   name: string
   apiAddress: string
+}
+
+export interface NodeResponse {
+  node: Node
+  profiles: Profile[]
 }
 
 export const useNodeStore = defineStore('node', () => {
