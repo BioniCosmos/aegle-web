@@ -2,7 +2,7 @@ import { getDateString, transfer, UTCTimeOffsets } from '@/utils'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { message } from './common'
+import { useMessage } from './common'
 import type { Profile } from './profile'
 
 export interface User {
@@ -112,21 +112,10 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function updateUserProfile(operation: Operation, id: string) {
-    const currentMsg = message.loading('Working…', { duration: 0 })
-    const res = await transfer(`/api/user/${user.value.id}`, 'PATCH', {
+    await useMessage(`/api/user/${user.value.id}`, 'PATCH', {
       operation,
       id,
     })
-    setTimeout(currentMsg.destroy, 3000)
-
-    if (res === null || typeof res === 'string') {
-      currentMsg.type = 'error'
-      currentMsg.content = res ?? 'Failed'
-      return
-    }
-
-    currentMsg.type = 'success'
-    currentMsg.content = res.message
   }
 
   return {

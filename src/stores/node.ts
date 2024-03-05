@@ -2,7 +2,7 @@ import { transfer } from '@/utils'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { message } from './common'
+import { useMessage } from './common'
 import type { Profile } from './profile'
 
 export interface Node {
@@ -51,20 +51,12 @@ export const useNodeStore = defineStore('node', () => {
   }
 
   async function deleteNode() {
-    await transfer(`/api/node/${node.value.id}`, 'DELETE')
+    await useMessage(`/api/node/${node.value.id}`, 'DELETE')
     await router.push('/nodes')
   }
 
   async function resetNode() {
-    const res = await transfer(`/api/node/${node.value.id}/reset`, 'POST')
-    if (res === null) {
-      return
-    }
-    if (typeof res === 'string') {
-      message.error(res)
-      return
-    }
-    message.success(res.message)
+    await useMessage(`/api/node/${node.value.id}/reset`, 'POST')
   }
 
   return {

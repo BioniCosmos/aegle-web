@@ -1,7 +1,7 @@
-import { transfer } from '@/utils'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { message, useMessage } from './common'
 
 export interface Profile {
   id: string
@@ -43,16 +43,31 @@ export const useProfileStore = defineStore('profile', () => {
 
   async function insertProfile() {
     const profileClone = Object.assign({}, profile.value)
-    profileClone.inbound = JSON.parse(profile.value.inbound)
-    profileClone.outbound = JSON.parse(profile.value.outbound)
-    await transfer('/api/profile', 'POST', profileClone)
+    try {
+      profileClone.inbound = JSON.parse(profile.value.inbound)
+      profileClone.outbound = JSON.parse(profile.value.outbound)
+    } catch (error) {
+      if (error instanceof Error) {
+        message.error(error.message)
+      }
+      return
+    }
+
+    await useMessage('/api/profile', 'POST', profileClone)
     await router.push('/nodes')
   }
 
   async function deleteProfile() {
-    await transfer(`/api/profile/${profile.value.id}`, 'DELETE')
+    await useMessage(`/api/profile/${profile.value.id}`, 'DELETE')
     await router.push('/nodes')
   }
 
-  return { profile, isToInsertProfile, toInsertProfile, toUpdateProfile, insertProfile, deleteProfile }
+  return {
+    profile,
+    isToInsertProfile,
+    toInsertProfile,
+    toUpdateProfile,
+    insertProfile,
+    deleteProfile,
+  }
 })
