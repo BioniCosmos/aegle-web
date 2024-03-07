@@ -4,7 +4,7 @@ import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 
 const accountStore = useAccountStore()
-const { account } = storeToRefs(accountStore)
+const { account, isExtended } = storeToRefs(accountStore)
 const router = useRouter()
 
 async function signIn() {
@@ -17,13 +17,30 @@ async function signIn() {
   <div class="h-[calc(100vh-4.25rem)] flex justify-center items-center">
     <article class="grid">
       <form class="mb-0" @submit.prevent="signIn">
-        <input type="text" placeholder="Username" aria-label="Username" autocomplete="nickname" required
-          v-model="account.username">
-        <input type="password" placeholder="Password" aria-label="Password" autocomplete="current-password" required
-          v-model="account.password">
+        <input
+          type="text"
+          placeholder="Username"
+          aria-label="Username"
+          autocomplete="nickname"
+          required
+          v-model="account.username"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          aria-label="Password"
+          autocomplete="current-password"
+          required
+          v-model="account.password"
+        />
         <fieldset>
           <label for="remember">
-            <input type="checkbox" role="switch" id="remember">
+            <input
+              type="checkbox"
+              role="switch"
+              id="remember"
+              v-model="isExtended"
+            />
             Remember me
           </label>
         </fieldset>
