@@ -1,27 +1,17 @@
 <script setup lang="ts">
 import BaseLayout from '@/components/BaseLayout.vue'
-import {
-  extendBillingDate,
-  fetchInvoices,
-  type Invoice,
-} from '@/stores/invoice'
-import { getDateString } from '@/utils'
-import { onMounted, ref, type Ref } from 'vue'
+import { useInvoiceStore, type Invoice } from '@/stores/invoice'
+import { getDateString, transfer } from '@/utils'
+import { storeToRefs } from 'pinia'
+import { onMounted } from 'vue'
 
-const invoices = ref(new Array<Ref<Invoice>>())
-
-async function submit(invoice: Ref<Invoice>) {
-  const tmp = await extendBillingDate(invoice)
-  if (tmp != null) {
-    invoices.value = tmp
-  }
-}
+const invoiceStore = useInvoiceStore()
+const { invoices } = storeToRefs(invoiceStore)
+const { extendBillingDate } = invoiceStore
 
 onMounted(async () => {
-  const tmp = await fetchInvoices()
-  if (tmp != null) {
-    invoices.value = tmp
-  }
+  const res = await transfer<Invoice[]>('/api/invoices')
+  invoices.value = Array.isArray(res) ? res : []
 })
 </script>
 
@@ -41,13 +31,13 @@ onMounted(async () => {
       <tbody>
         <tr
           v-for="invoice in invoices"
-          :key="invoice.value.id"
-          :style="{ backgroundColor: invoice.value.isPaid ? 'unset' : 'red' }"
+          :key="invoice.id"
+          :style="{ backgroundColor: invoice.isPaid ? 'unset' : 'red' }"
         >
-          <td>{{ invoice.value.name }}</td>
-          <td>{{ getDateString(invoice.value.nextBillingDate) }}</td>
+          <td>{{ invoice.name }}</td>
+          <td>{{ getDateString(invoice.nextBillingDate) }}</td>
           <td>
-            <button type="button" @click="submit(invoice)">Extend</button>
+            <button @click="extendBillingDate(invoice.id)">Extend</button>
           </td>
         </tr>
       </tbody>

@@ -1,5 +1,6 @@
 import { transfer } from '@/utils'
-import { ref, type Ref } from 'vue'
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
 export interface Invoice {
   id: string
@@ -8,13 +9,22 @@ export interface Invoice {
   isPaid: boolean
 }
 
-export async function fetchInvoices() {
-  return ((await transfer('/api/invoices') ?? new Array()) as Array<Invoice>).map(value => ref(value))
-}
+export const useInvoiceStore = defineStore('invoice', () => {
+  const invoices = ref<Invoice[]>([])
 
-export async function extendBillingDate(invoice: Ref<Invoice>) {
-  await transfer(`/api/invoice/${invoice.value.id}`, 'PATCH', {
-    billingDate: invoice.value.nextBillingDate
-  })
-  return fetchInvoices()
-}
+  async function extendBillingDate(invoiceId: string) {
+    const res = await transfer<Invoice>(`/api/invoice/${invoiceId}`, 'PATCH', {
+      billingDate: invoices.value.find(({ id }) => id === invoiceId)
+        ?.nextBillingDate,
+    })
+    if (res === null || typeof res === 'string') {
+      return
+    }
+
+    invoices.value = invoices.value.map((invoice) =>
+      invoice.id === invoiceId ? res : invoice
+    )
+  }
+
+  return { invoices, extendBillingDate }
+})
