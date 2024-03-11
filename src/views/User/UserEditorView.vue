@@ -37,7 +37,8 @@ function updateProfiles(event: Event) {
 }
 
 onMounted(async () => {
-  profiles.value = ((await transfer('/api/profiles')) as Profile[]) ?? []
+  const res = await transfer<Profile[]>('/api/profiles')
+  profiles.value = Array.isArray(res) ? res : []
 })
 </script>
 
