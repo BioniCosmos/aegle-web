@@ -13,7 +13,7 @@ defineEmits<{
 
 const userStore = useUserStore()
 const { user, isToInsertUser, billingDate } = storeToRefs(userStore)
-const { insertUser, deleteUser, updateUserProfile } = userStore
+const { insertUser, deleteUser, updateUserProfile, generate } = userStore
 const title = computed(() =>
   isToInsertUser.value ? 'Adding a user' : 'Editing a user'
 )
@@ -56,6 +56,9 @@ onMounted(async () => {
       <li>
         <a href="#" role="button" @click="isOpen = true">Remove the user</a>
       </li>
+    </template>
+    <template #operations v-else>
+      <li><a href="#" role="button" @click="generate">Generate</a></li>
     </template>
     <form @submit.prevent="insertUser">
       <label for="name">

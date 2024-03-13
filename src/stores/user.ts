@@ -118,6 +118,19 @@ export const useUserStore = defineStore('user', () => {
     })
   }
 
+  function generate() {
+    const uuid = crypto.randomUUID()
+    user.value = {
+      ...user.value,
+      billingDate: new Date().toISOString().slice(0, 10),
+      account: {
+        vless: { id: uuid, flow: 'xtls-rprx-vision', encryption: 'none' },
+        vmess: { id: uuid, security: 'auto' },
+        trojan: { password: uuid },
+      },
+    }
+  }
+
   return {
     user,
     isToInsertUser,
@@ -127,5 +140,6 @@ export const useUserStore = defineStore('user', () => {
     insertUser,
     deleteUser,
     updateUserProfile,
+    generate,
   }
 })
