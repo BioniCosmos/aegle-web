@@ -7,7 +7,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      component: () => import('@/views/InvoiceView.vue'),
+      redirect: '/nodes',
     },
     {
       path: '/nodes',

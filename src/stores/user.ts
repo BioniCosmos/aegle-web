@@ -1,18 +1,42 @@
-import { getDateString, transfer, UTCTimeOffsets } from '@/utils'
+import { transfer } from '@/utils'
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMessage } from './common'
 import type { Profile } from './profile'
 
-export interface User {
-  id: string
-  name: string
-  email: string
-  level: number
-  billingDate: string
-  account: Account
-  profiles: Map<string, string>
+export class User {
+  id = ''
+  name = ''
+  email = ''
+  level = 0
+  account: Account = {
+    vless: { id: '', flow: '', encryption: '' },
+    vmess: { id: '', security: '' },
+    trojan: { password: '' },
+  }
+  profiles: Record<string, string> = {}
+  startDate = Temporal.Now.zonedDateTimeISO()
+  cycles = 1
+
+  get nextDate() {
+    return this.startDate.add({ months: this.cycles })
+  }
+
+  set nextDate(date) {
+    this.startDate = date.subtract({ months: 1 })
+    this.cycles = 1
+  }
+
+  static fromUserData(userData: User) {
+    delete (userData as any).nextDate
+    const user = new User()
+    return Object.assign(user, userData)
+  }
+
+  toJSON(): User {
+    return { ...this, nextDate: this.nextDate } satisfies User
+  }
 }
 
 interface Account {
@@ -46,63 +70,26 @@ export interface UserResponse {
   profiles: Profile[]
 }
 
-const newUser = (): User => {
-  const user = JSON.parse(
-    JSON.stringify({
-      id: '',
-      name: '',
-      email: '',
-      level: 0,
-      billingDate: '',
-      account: {
-        vless: { id: '', flow: '', encryption: '' },
-        vmess: { id: '', security: '' },
-        trojan: { password: '' },
-      },
-    })
-  )
-  user.profiles = new Map()
-  return user
-}
-
 export const useUserStore = defineStore('user', () => {
-  const user = ref<User>(newUser())
+  const user = ref(new User())
   const isToInsertUser = ref(true)
-
-  const billingDate = computed({
-    get: () => getDateString(user.value.billingDate),
-    set: (newDate) => {
-      user.value.billingDate =
-        newDate !== ''
-          ? new Date(
-              `${newDate}T00:00${UTCTimeOffsets(new Date())}`
-            ).toISOString()
-          : ''
-    },
-  })
 
   const router = useRouter()
 
   async function toInsertUser() {
-    user.value = newUser()
+    user.value = new User()
     isToInsertUser.value = true
     await router.push('/user')
   }
 
-  async function toUpdateUser(updatedUser: User) {
-    user.value = {
-      ...updatedUser,
-      profiles: new Map(Object.entries(updatedUser.profiles)),
-    }
+  async function toUpdateUser(userData: User) {
+    user.value = User.fromUserData(userData)
     isToInsertUser.value = false
     await router.push('/user')
   }
 
   async function insertUser() {
-    await transfer('/api/user', 'POST', {
-      ...user.value,
-      profiles: Object.fromEntries(user.value.profiles.entries()),
-    })
+    await transfer('/api/user', 'POST', user.value)
     await router.push('/users')
   }
 
@@ -120,26 +107,29 @@ export const useUserStore = defineStore('user', () => {
 
   function generate() {
     const uuid = crypto.randomUUID()
-    user.value = {
-      ...user.value,
-      billingDate: new Date().toISOString().slice(0, 10),
+    Object.assign(user.value, {
       account: {
         vless: { id: uuid, flow: 'xtls-rprx-vision', encryption: 'none' },
         vmess: { id: uuid, security: 'auto' },
         trojan: { password: uuid },
       },
-    }
+    })
+  }
+
+  async function extend() {
+    user.value.cycles++
+    await useMessage('/api/user', 'PUT', user.value)
   }
 
   return {
     user,
     isToInsertUser,
-    billingDate,
     toInsertUser,
     toUpdateUser,
     insertUser,
     deleteUser,
     updateUserProfile,
     generate,
+    extend,
   }
 })

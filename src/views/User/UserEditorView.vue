@@ -12,8 +12,9 @@ defineEmits<{
 }>()
 
 const userStore = useUserStore()
-const { user, isToInsertUser, billingDate } = storeToRefs(userStore)
-const { insertUser, deleteUser, updateUserProfile, generate } = userStore
+const { user, isToInsertUser } = storeToRefs(userStore)
+const { insertUser, deleteUser, updateUserProfile, generate, extend } =
+  userStore
 const title = computed(() =>
   isToInsertUser.value ? 'Adding a user' : 'Editing a user'
 )
@@ -24,16 +25,25 @@ function updateProfiles(event: Event) {
   const checked = (event.target as HTMLInputElement).checked
   const profileId = (event.target as HTMLInputElement).value
   if (checked) {
-    user.value.profiles.set(profileId, '')
+    user.value.profiles.profileId = ''
     if (!isToInsertUser.value) {
       updateUserProfile(Operation.Add, profileId)
     }
   } else {
-    user.value.profiles.delete(profileId)
+    delete user.value.profiles.profileId
     if (!isToInsertUser.value) {
       updateUserProfile(Operation.Remove, profileId)
     }
   }
+}
+
+function handleDateInput(event: Event) {
+  user.value.nextDate = Temporal.PlainDate.from(
+    (event.target as HTMLInputElement).value
+  ).toZonedDateTime({
+    timeZone: user.value.nextDate.timeZoneId,
+    plainTime: user.value.nextDate.toPlainTime(),
+  })
 }
 
 onMounted(async () => {
@@ -52,6 +62,9 @@ onMounted(async () => {
         <a :href="`/api/user/${user.id}/sub`" role="button" target="_blank"
           >Subscription link</a
         >
+      </li>
+      <li>
+        <a href="#" role="button" @click="extend">Extend</a>
       </li>
       <li>
         <a href="#" role="button" @click="isOpen = true">Remove the user</a>
@@ -91,13 +104,14 @@ onMounted(async () => {
           :readonly="!isToInsertUser"
         />
       </label>
-      <label for="billing-date">
-        Billing Date
+      <label for="next-date">
+        Next billing date
         <input
           type="date"
-          id="billing-date"
+          id="next-date"
           required
-          v-model="billingDate"
+          :value="user.nextDate.toPlainDate().toString()"
+          @input="handleDateInput"
           :readonly="!isToInsertUser"
         />
       </label>
@@ -177,7 +191,7 @@ onMounted(async () => {
             type="checkbox"
             :id="`profile-${profile.id}`"
             :value="profile.id"
-            :checked="user.profiles.has(profile.id)"
+            :checked="user.profiles[profile.id] !== undefined"
             @change="updateProfiles"
           />
           {{ profile.name }}

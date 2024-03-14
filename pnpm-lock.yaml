@@ -11,6 +11,9 @@ dependencies:
   pinia:
     specifier: ^2.1.7
     version: 2.1.7(typescript@5.3.3)(vue@3.4.19)
+  temporal-polyfill:
+    specifier: ^0.2.3
+    version: 0.2.3
   vue:
     specifier: ^3.4.19
     version: 3.4.19(typescript@5.3.3)
@@ -2254,6 +2257,16 @@ packages:
     transitivePeerDependencies:
       - ts-node
     dev: true
+
+  /temporal-polyfill@0.2.3:
+    resolution: {integrity: sha512-7ZJRc7wq/1XjrOQYkkNpgo2qfE9XLrUU8D/DS+LAC/T0bYqZ46rW6dow0sOTXTPZS4bwer8bD/0OyuKQBfA3yw==}
+    dependencies:
+      temporal-spec: 0.2.0
+    dev: false
+
+  /temporal-spec@0.2.0:
+    resolution: {integrity: sha512-r1AT0XdEp8TMQ13FLvOt8mOtAxDQsRt2QU5rSWCA7YfshddU651Y1NHVrceLANvixKdf9fYO8B/S9fXHodB7HQ==}
+    dev: false
 
   /text-table@0.2.0:
     resolution: {integrity: sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==}

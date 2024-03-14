@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import BaseLayout from '@/components/BaseLayout.vue'
 import { useProfileStore } from '@/stores/profile'
-import type { UserResponse } from '@/stores/user'
+import type { User, UserResponse } from '@/stores/user'
 import { useUserStore } from '@/stores/user'
-import { getDateString, transfer } from '@/utils'
+import { transfer } from '@/utils'
 import { ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -14,6 +14,15 @@ const users = ref<UserResponse[]>([])
 const page = ref(
   ((page) => (Number.isNaN(page) ? 1 : page))(Number(route.query['page']))
 )
+
+function isPaid(user: User) {
+  return (
+    Temporal.ZonedDateTime.compare(
+      user.nextDate,
+      Temporal.Now.zonedDateTimeISO()
+    ) !== -1
+  )
+}
 
 watchEffect(async () => {
   const res = await transfer<UserResponse[]>(
@@ -40,7 +49,7 @@ watchEffect(async () => {
           <th scope="col">Email</th>
           <th scope="col">Level</th>
           <th scope="col">Billing Date</th>
-          <th scope="col">Profiles</th>
+          <th scope="col">Operations</th>
         </tr>
       </thead>
       <tbody>
@@ -48,11 +57,12 @@ watchEffect(async () => {
           v-for="{ user, profiles } in users"
           :key="user.id"
           @click="toUpdateUser(user)"
+          :style="{ backgroundColor: isPaid(user) ? 'unset' : 'red' }"
         >
           <td>{{ user.name }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.level }}</td>
-          <td>{{ getDateString(user.billingDate) }}</td>
+          <td>{{ user.nextDate.toPlainDate() }}</td>
           <td>
             <button
               type="button"
