@@ -3,7 +3,6 @@ import { useAccountStore } from '@/stores/account'
 import { storeToRefs } from 'pinia'
 import { RouterLink, useRouter } from 'vue-router'
 import CloudIcon from './icons/CloudIcon.vue'
-import CreditCardIcon from './icons/CreditCardIcon.vue'
 import LogOutIcon from './icons/LogOutIcon.vue'
 import UsersIcon from './icons/UsersIcon.vue'
 
@@ -28,11 +27,6 @@ async function signOut() {
       </li>
     </ul>
     <ul v-if="isAuthorized">
-      <li>
-        <RouterLink to="/">
-          <CreditCardIcon />
-        </RouterLink>
-      </li>
       <li>
         <RouterLink to="/nodes">
           <CloudIcon />

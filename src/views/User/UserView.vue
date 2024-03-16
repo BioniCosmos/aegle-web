@@ -4,25 +4,22 @@ import { useProfileStore } from '@/stores/profile'
 import type { User, UserResponse } from '@/stores/user'
 import { useUserStore } from '@/stores/user'
 import { transfer } from '@/utils'
-import { ref, watchEffect } from 'vue'
+import { ref, shallowRef, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const { toUpdateProfile } = useProfileStore()
 const { toInsertUser, toUpdateUser } = useUserStore()
-const users = ref<UserResponse[]>([])
+const users = shallowRef<UserResponse[]>([])
 const page = ref(
   ((page) => (Number.isNaN(page) ? 1 : page))(Number(route.query['page']))
 )
 
-function isPaid(user: User) {
-  return (
-    Temporal.ZonedDateTime.compare(
-      user.nextDate,
-      Temporal.Now.zonedDateTimeISO()
-    ) !== -1
-  )
-}
+const isPaid = (user: User) =>
+  Temporal.ZonedDateTime.compare(
+    user.nextDate,
+    Temporal.Now.zonedDateTimeISO()
+  ) !== -1
 
 watchEffect(async () => {
   const res = await transfer<UserResponse[]>(
