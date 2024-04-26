@@ -33,7 +33,7 @@ watchEffect(async () => {
         <a href="#" role="button" @click="toInsertNode">Add</a>
       </li>
     </template>
-    <table>
+    <table v-if="nodes.length !== 0">
       <thead>
         <tr>
           <th scope="col">Name</th>
@@ -62,6 +62,7 @@ watchEffect(async () => {
         </tr>
       </tbody>
     </table>
+    <div v-else class="text-center">Nothing here</div>
   </BaseLayout>
   <nav>
     <ul>

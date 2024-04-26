@@ -39,7 +39,7 @@ watchEffect(async () => {
         <a href="#" role="button" @click="toInsertUser">Add</a>
       </li>
     </template>
-    <table>
+    <table v-if="users.length !== 0">
       <thead>
         <tr>
           <th scope="col">Name</th>
@@ -73,5 +73,6 @@ watchEffect(async () => {
         </tr>
       </tbody>
     </table>
+    <div v-else>Nothing here</div>
   </BaseLayout>
 </template>
