@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import BaseLayout from '@/components/BaseLayout.vue'
 import { useProfileStore } from '@/stores/profile'
-import type { User, UserResponse } from '@/stores/user'
-import { useUserStore } from '@/stores/user'
+import { getNextDate, type User, type UserResponse } from '@/stores/user'
 import { transfer } from '@/utils'
 import { ref, shallowRef, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const { toUpdateProfile } = useProfileStore()
-const { toInsertUser, toUpdateUser } = useUserStore()
 const users = shallowRef<UserResponse[]>([])
 const page = ref(
   ((page) => (Number.isNaN(page) ? 1 : page))(Number(route.query['page']))
@@ -17,7 +15,7 @@ const page = ref(
 
 const isPaid = (user: User) =>
   Temporal.ZonedDateTime.compare(
-    user.nextDate,
+    getNextDate(user),
     Temporal.Now.zonedDateTimeISO()
   ) !== -1
 
@@ -36,7 +34,7 @@ watchEffect(async () => {
     </template>
     <template #operations>
       <li>
-        <a href="#" role="button" @click="toInsertUser">Add</a>
+        <RouterLink to="/user" role="button">Add</RouterLink>
       </li>
     </template>
     <table v-if="users.length !== 0">
@@ -53,13 +51,13 @@ watchEffect(async () => {
         <tr
           v-for="{ user, profiles } in users"
           :key="user.id"
-          @click="toUpdateUser(user)"
+          @click="$router.push(`/user/${user.id}`)"
           :style="{ backgroundColor: isPaid(user) ? 'unset' : 'red' }"
         >
           <td>{{ user.name }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.level }}</td>
-          <td>{{ user.nextDate.toPlainDate() }}</td>
+          <td>{{ getNextDate(user).toPlainDate() }}</td>
           <td>
             <button
               type="button"
@@ -73,6 +71,6 @@ watchEffect(async () => {
         </tr>
       </tbody>
     </table>
-    <div v-else>Nothing here</div>
+    <div v-else class="text-center">Nothing here</div>
   </BaseLayout>
 </template>

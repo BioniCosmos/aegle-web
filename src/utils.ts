@@ -1,3 +1,5 @@
+import { parseUser } from './stores/user'
+
 export interface DefaultResponse {
   code: number
   message: string
@@ -18,18 +20,11 @@ export async function transfer<T = DefaultResponse>(
   try {
     const resp = await fetch(input, init)
     if (resp.ok) {
-      return JSON.parse(await resp.text(), reviver) as Promise<T>
+      return parseUser(await resp.text()) as Promise<T>
     }
     return resp.text()
   } catch (err) {
     console.error(err)
     return null
   }
-}
-
-function reviver(key: string, value: any) {
-  if (key.endsWith('Date')) {
-    return Temporal.ZonedDateTime.from(value)
-  }
-  return value
 }

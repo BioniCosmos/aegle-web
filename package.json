@@ -13,6 +13,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "ky": "^1.2.4",
     "naive-ui": "^2.38.0",
     "pinia": "^2.1.7",
     "temporal-polyfill": "^0.2.3",

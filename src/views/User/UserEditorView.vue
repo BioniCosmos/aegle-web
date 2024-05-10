@@ -1,67 +1,117 @@
 <script setup lang="ts">
 import BaseLayout from '@/components/BaseLayout.vue'
 import WarningDialogBox from '@/components/WarningDialogBox.vue'
+import { useMessage } from '@/stores/common'
 import type { Profile } from '@/stores/profile'
-import { Operation, useUserStore } from '@/stores/user'
-import { transfer } from '@/utils'
-import { storeToRefs } from 'pinia'
+import { Operation, User, getNextDate, parseUser } from '@/stores/user'
+import ky from 'ky'
+import 'temporal-polyfill/global'
 import { computed, onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 
-defineEmits<{
-  (event: 'delete'): void
-}>()
+defineEmits<{ (event: 'delete'): void }>()
 
-const userStore = useUserStore()
-const { user, isToInsertUser } = storeToRefs(userStore)
-const { insertUser, deleteUser, updateUserProfile, generate, extend } =
-  userStore
-const title = computed(() =>
-  isToInsertUser.value ? 'Adding a user' : 'Editing a user'
-)
-const profiles = ref(new Array<Profile>())
+const id = useRoute().params.id as string
+const isUpdate = computed(() => id !== '')
+
+const user = ref(new User())
+const profiles = ref(Array.of<Profile>())
+onMounted(() => {
+  ky('/api/profiles')
+    .json<Profile[]>()
+    .then((value) => (profiles.value = value))
+  if (isUpdate.value) {
+    ky(`/api/user/${id}`, { parseJson: parseUser })
+      .json<User>()
+      .then((value) => (user.value = value))
+  }
+})
+
+const nextDate = computed(() => getNextDate(user.value))
 const isOpen = ref(false)
 
-function updateProfiles(event: Event) {
-  const checked = (event.target as HTMLInputElement).checked
-  const profileId = (event.target as HTMLInputElement).value
-  if (checked) {
-    user.value.profiles.profileId = ''
-    if (!isToInsertUser.value) {
-      updateUserProfile(Operation.Add, profileId)
-    }
-  } else {
-    delete user.value.profiles.profileId
-    if (!isToInsertUser.value) {
-      updateUserProfile(Operation.Remove, profileId)
-    }
+function extend() {
+  const updatedUser = { ...user.value, cycles: user.value.cycles + 1 }
+  const json = {
+    id: updatedUser.id,
+    cycles: updatedUser.cycles,
+    nextDate: getNextDate(updatedUser),
+  }
+  ky.put('/api/user', { json }).then(() => (user.value = updatedUser))
+}
+
+function update(event: Event) {
+  const input = event.target as HTMLInputElement
+  const { checked, value } = input
+  user.value.profileIds = checked
+    ? [...user.value.profileIds, value]
+    : user.value.profileIds.filter((profileId) => profileId !== value)
+  if (isUpdate.value) {
+    useMessage(`/api/user/${id}`, 'PATCH', {
+      operation: checked ? Operation.Add : Operation.Remove,
+      id: value,
+    })
   }
 }
 
 function handleDateInput(event: Event) {
-  user.value.nextDate = Temporal.PlainDate.from(
-    (event.target as HTMLInputElement).value
-  ).toZonedDateTime({
-    timeZone: user.value.nextDate.timeZoneId,
-    plainTime: user.value.nextDate.toPlainTime(),
+  const input = event.target as HTMLInputElement
+  const newNextDate = Temporal.PlainDate.from(input.value).toZonedDateTime({
+    timeZone: nextDate.value.timeZoneId,
+    plainTime: nextDate.value.toPlainTime(),
   })
+  user.value.cycles = newNextDate.since(user.value.startDate, {
+    smallestUnit: 'month',
+  }).months
 }
 
-onMounted(async () => {
-  const res = await transfer<Profile[]>('/api/profiles')
-  profiles.value = Array.isArray(res) ? res : []
-})
+const capitalize = (s: string) => s[0].toUpperCase() + s.slice(1)
+
+function inputType(key: keyof User) {
+  if (key === 'email') {
+    return 'email'
+  }
+  if (typeof user.value[key] === 'number') {
+    return 'number'
+  }
+  return 'text'
+}
+
+function protoName(proto: string) {
+  if (proto === 'vless') {
+    return 'VLESS'
+  }
+  if (proto === 'vmess') {
+    return 'VMess'
+  }
+  if (proto === 'trojan') {
+    return 'Trojan'
+  }
+  return ''
+}
+
+function generate() {
+  const id = crypto.randomUUID()
+  user.value.account = {
+    vless: { id, flow: 'xtls-rprx-vision', encryption: 'none' },
+    vmess: { id, security: 'auto' },
+    trojan: { password: id },
+  }
+}
 </script>
 
 <template>
   <BaseLayout>
     <template #title>
-      <h3 class="mb-0">{{ title }}</h3>
+      <h3 class="mb-0">
+        {{ isUpdate ? 'Update user' : 'Create user' }}
+      </h3>
     </template>
-    <template #operations v-if="!isToInsertUser">
+    <template #operations v-if="isUpdate">
       <li>
-        <a :href="`/api/user/${user.id}/sub`" role="button" target="_blank"
-          >Subscription link</a
-        >
+        <a :href="`/api/user/${id}/sub`" role="button" target="_blank">
+          Subscription link
+        </a>
       </li>
       <li>
         <a href="#" role="button" @click="extend">Extend</a>
@@ -71,139 +121,70 @@ onMounted(async () => {
       </li>
     </template>
     <template #operations v-else>
-      <li><a href="#" role="button" @click="generate">Generate</a></li>
+      <li>
+        <a href="#" role="button" @click="generate">Generate</a>
+      </li>
     </template>
-    <form @submit.prevent="insertUser">
-      <label for="name">
-        Name
+    <form
+      @submit.prevent="
+        ky.post('/api/user', { json: { ...user, nextDate } }).then(() =>
+          $router.replace('/users')
+        )
+      "
+    >
+      <label v-for="key in ['name', 'email', 'level'] as const" :key="key">
+        {{ capitalize(key) }}
         <input
-          type="text"
-          id="name"
           required
-          v-model="user.name"
-          :readonly="!isToInsertUser"
+          :type="inputType(key)"
+          :readonly="isUpdate"
+          v-model="user[key]"
         />
       </label>
-      <label for="email">
-        Email
-        <input
-          type="email"
-          id="email"
-          required
-          v-model="user.email"
-          :readonly="!isToInsertUser"
-        />
-      </label>
-      <label for="level">
-        Level
-        <input
-          type="number"
-          id="level"
-          required
-          v-model="user.level"
-          :readonly="!isToInsertUser"
-        />
-      </label>
-      <label for="next-date">
+      <label>
         Next billing date
         <input
-          type="date"
-          id="next-date"
           required
-          :value="user.nextDate.toPlainDate().toString()"
+          type="date"
+          :readonly="isUpdate"
+          :value="nextDate.toPlainDate().toString()"
           @input="handleDateInput"
-          :readonly="!isToInsertUser"
         />
       </label>
-      <h5>VLESS</h5>
-      <div class="grid">
-        <label for="vless-id">
-          Id
-          <input
-            id="vless-id"
-            required
-            v-model="user.account.vless.id"
-            :readonly="!isToInsertUser"
-          />
-        </label>
-        <label for="vless-flow">
-          Flow
-          <input
-            id="vless-flow"
-            required
-            v-model="user.account.vless.flow"
-            :readonly="!isToInsertUser"
-          />
-        </label>
-        <label for="vless-encryption">
-          Encryption
-          <input
-            id="vless-encryption"
-            required
-            v-model="user.account.vless.encryption"
-            :readonly="!isToInsertUser"
-          />
-        </label>
-      </div>
-      <h5>VMess</h5>
-      <div class="grid">
-        <label for="vmess-id">
-          Id
-          <input
-            id="vmess-id"
-            required
-            v-model="user.account.vmess.id"
-            :readonly="!isToInsertUser"
-          />
-        </label>
-        <label for="vmess-security">
-          Security
-          <input
-            id="vmess-security"
-            required
-            v-model="user.account.vmess.security"
-            :readonly="!isToInsertUser"
-          />
-        </label>
-      </div>
-      <h5>Trojan</h5>
-      <div class="grid">
-        <label for="trojan-password">
-          Password
-          <input
-            id="trojan-password"
-            required
-            v-model="user.account.trojan.password"
-            :readonly="!isToInsertUser"
-          />
-        </label>
-      </div>
+      <template v-for="(value, key) in user.account" :key="key">
+        <h5 class="mb-2">{{ protoName(key) }}</h5>
+        <div class="grid">
+          <label v-for="(_v, k) in value" :key="k">
+            {{ capitalize(k) }}
+            <input
+              required
+              :readonly="isUpdate"
+              v-model="user.account[key][k]"
+            />
+          </label>
+        </div>
+      </template>
       <fieldset>
         <legend>
-          <h5>Profiles</h5>
+          <h5 class="mb-2">Profiles</h5>
         </legend>
-        <label
-          v-for="profile in profiles"
-          :key="profile.id"
-          :for="`profile-${profile.id}`"
-        >
+        <label v-for="profile in profiles" :key="profile.id">
           <input
             type="checkbox"
-            :id="`profile-${profile.id}`"
             :value="profile.id"
-            :checked="user.profiles[profile.id] !== undefined"
-            @change="updateProfiles"
+            :checked="user.profileIds.includes(profile.id)"
+            @change="update"
           />
           {{ profile.name }}
         </label>
       </fieldset>
-      <button v-if="isToInsertUser">Submit</button>
+      <button v-if="!isUpdate">Submit</button>
     </form>
   </BaseLayout>
   <WarningDialogBox
     :name="user.name"
     :is-open="isOpen"
-    @delete="deleteUser"
+    @delete="ky.delete(`/api/user/${id}`).then(() => $router.replace('/users'))"
     @close="isOpen = false"
   />
 </template>
