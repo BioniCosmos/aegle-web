@@ -3,7 +3,7 @@ import BaseLayout from '@/components/BaseLayout.vue'
 import WarningDialogBox from '@/components/WarningDialogBox.vue'
 import { useMessage } from '@/stores/common'
 import type { Profile } from '@/stores/profile'
-import { Operation, User, getNextDate, parseUser } from '@/stores/user'
+import { User, getNextDate, parseUser } from '@/stores/user'
 import ky from 'ky'
 import 'temporal-polyfill/global'
 import { computed, onMounted, ref } from 'vue'
@@ -43,13 +43,14 @@ function extend() {
 function update(event: Event) {
   const input = event.target as HTMLInputElement
   const { checked, value } = input
-  user.value.profileIds = checked
-    ? [...user.value.profileIds, value]
-    : user.value.profileIds.filter((profileId) => profileId !== value)
+  user.value.profileNames = checked
+    ? [...user.value.profileNames, value]
+    : user.value.profileNames.filter((profileId) => profileId !== value)
   if (isUpdate.value) {
-    useMessage(`/api/user/${id}`, 'PATCH', {
-      operation: checked ? Operation.Add : Operation.Remove,
-      id: value,
+    useMessage(`/api/user`, 'PATCH', {
+      id,
+      profileName: value,
+      action: checked ? 'add' : 'remove',
     })
   }
 }
@@ -77,26 +78,10 @@ function inputType(key: keyof User) {
   return 'text'
 }
 
-function protoName(proto: string) {
-  if (proto === 'vless') {
-    return 'VLESS'
-  }
-  if (proto === 'vmess') {
-    return 'VMess'
-  }
-  if (proto === 'trojan') {
-    return 'Trojan'
-  }
-  return ''
-}
-
 function generate() {
-  const id = crypto.randomUUID()
-  user.value.account = {
-    vless: { id, flow: 'xtls-rprx-vision', encryption: 'none' },
-    vmess: { id, security: 'auto' },
-    trojan: { password: id },
-  }
+  user.value.uuid = crypto.randomUUID()
+  user.value.flow = 'xtls-rprx-vision'
+  user.value.security = 'auto'
 }
 </script>
 
@@ -132,7 +117,17 @@ function generate() {
         )
       "
     >
-      <label v-for="key in ['name', 'email', 'level'] as const" :key="key">
+      <label
+        v-for="key in [
+          'name',
+          'email',
+          'level',
+          'uuid',
+          'flow',
+          'security',
+        ] as const"
+        :key="key"
+      >
         {{ capitalize(key) }}
         <input
           required
@@ -151,28 +146,15 @@ function generate() {
           @input="handleDateInput"
         />
       </label>
-      <template v-for="(value, key) in user.account" :key="key">
-        <h5 class="mb-2">{{ protoName(key) }}</h5>
-        <div class="grid">
-          <label v-for="(_v, k) in value" :key="k">
-            {{ capitalize(k) }}
-            <input
-              required
-              :readonly="isUpdate"
-              v-model="user.account[key][k]"
-            />
-          </label>
-        </div>
-      </template>
       <fieldset>
         <legend>
           <h5 class="mb-2">Profiles</h5>
         </legend>
-        <label v-for="profile in profiles" :key="profile.id">
+        <label v-for="profile in profiles" :key="profile.name">
           <input
             type="checkbox"
-            :value="profile.id"
-            :checked="user.profileIds.includes(profile.id)"
+            :value="profile.name"
+            :checked="user.profileNames.includes(profile.name)"
             @change="update"
           />
           {{ profile.name }}

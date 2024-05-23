@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import BaseLayout from '@/components/BaseLayout.vue'
 import { useProfileStore } from '@/stores/profile'
-import { getNextDate, type User, type UserResponse } from '@/stores/user'
+import { getNextDate, type User } from '@/stores/user'
 import { transfer } from '@/utils'
 import { ref, shallowRef, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const { toUpdateProfile } = useProfileStore()
-const users = shallowRef<UserResponse[]>([])
+const users = shallowRef<User[]>([])
 const page = ref(
   ((page) => (Number.isNaN(page) ? 1 : page))(Number(route.query['page']))
 )
@@ -20,7 +20,7 @@ const isPaid = (user: User) =>
   ) !== -1
 
 watchEffect(async () => {
-  const res = await transfer<UserResponse[]>(
+  const res = await transfer<User[]>(
     `/api/users?limit=10&skip=${(page.value - 1) * 10}`
   )
   users.value = res !== null && typeof res !== 'string' ? res : []
@@ -49,7 +49,7 @@ watchEffect(async () => {
       </thead>
       <tbody>
         <tr
-          v-for="{ user, profiles } in users"
+          v-for="user in users"
           :key="user.id"
           @click="$router.push(`/user/${user.id}`)"
           :style="{ backgroundColor: isPaid(user) ? 'unset' : 'red' }"
@@ -61,11 +61,11 @@ watchEffect(async () => {
           <td>
             <button
               type="button"
-              v-for="profile in profiles"
-              :key="profile.id"
-              @click.stop="toUpdateProfile(profile)"
+              v-for="profileName in user.profileNames"
+              :key="profileName"
+              @click.stop="toUpdateProfile(profileName)"
             >
-              {{ profile.name }}
+              {{ profileName }}
             </button>
           </td>
         </tr>

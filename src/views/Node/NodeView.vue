@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import BaseLayout from '@/components/BaseLayout.vue'
-import type { NodeResponse } from '@/stores/node'
-import { useNodeStore } from '@/stores/node'
+import { useNodeStore, type Node } from '@/stores/node'
 import { useProfileStore } from '@/stores/profile'
 import { transfer } from '@/utils'
 import { ref, watchEffect } from 'vue'
@@ -10,13 +9,13 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const { toInsertNode, toUpdateNode } = useNodeStore()
 const { toUpdateProfile } = useProfileStore()
-const nodes = ref<NodeResponse[]>([])
+const nodes = ref<Node[]>([])
 const page = ref(
   ((page) => (Number.isNaN(page) ? 1 : page))(Number(route.query['page']))
 )
 
 watchEffect(async () => {
-  const res = await transfer<NodeResponse[]>(
+  const res = await transfer<Node[]>(
     `/api/nodes?limit=10&skip=${(page.value - 1) * 10}`
   )
   nodes.value = Array.isArray(res) ? res : []
@@ -42,21 +41,17 @@ watchEffect(async () => {
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="{ node, profiles } in nodes"
-          :key="node.id"
-          @click="toUpdateNode(node)"
-        >
+        <tr v-for="node in nodes" :key="node.id" @click="toUpdateNode(node)">
           <td>{{ node.name }}</td>
           <td>{{ node.apiAddress }}</td>
           <td>
             <button
               type="button"
-              v-for="profile in profiles"
-              :key="profile.id"
-              @click.stop="toUpdateProfile(profile)"
+              v-for="profileName in node.profileNames"
+              :key="profileName"
+              @click.stop="toUpdateProfile(profileName)"
             >
-              {{ profile.name }}
+              {{ profileName }}
             </button>
           </td>
         </tr>

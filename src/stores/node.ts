@@ -3,17 +3,12 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useMessage } from './common'
-import type { Profile } from './profile'
 
 export interface Node {
   id: string
   name: string
   apiAddress: string
-}
-
-export interface NodeResponse {
-  node: Node
-  profiles: Profile[]
+  profileNames: string[]
 }
 
 export const useNodeStore = defineStore('node', () => {
@@ -55,10 +50,6 @@ export const useNodeStore = defineStore('node', () => {
     await router.push('/nodes')
   }
 
-  async function resetNode() {
-    await useMessage(`/api/node/${node.value.id}/reset`, 'POST')
-  }
-
   return {
     node,
     isToInsertNode,
@@ -67,6 +58,5 @@ export const useNodeStore = defineStore('node', () => {
     insertNode,
     updateNode,
     deleteNode,
-    resetNode,
   }
 })

@@ -13,7 +13,7 @@ defineEmits<{
 
 const nodeStore = useNodeStore()
 const { node, isToInsertNode } = storeToRefs(nodeStore)
-const { insertNode, updateNode, deleteNode, resetNode } = nodeStore
+const { insertNode, updateNode, deleteNode } = nodeStore
 const { toInsertProfile } = useProfileStore()
 const submit = computed(() => (isToInsertNode.value ? insertNode : updateNode))
 const title = computed(() =>
@@ -32,9 +32,6 @@ const isOpen = ref(false)
         <a href="#" role="button" @click="toInsertProfile(node.id)"
           >Add a profile</a
         >
-      </li>
-      <li>
-        <a href="#" role="button" @click="resetNode">Reset the node</a>
       </li>
       <li>
         <a href="#" role="button" @click="isOpen = true">Remove the node</a>
