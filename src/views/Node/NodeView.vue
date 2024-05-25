@@ -1,25 +1,24 @@
 <script setup lang="ts">
 import BaseLayout from '@/components/BaseLayout.vue'
+import WarningDialogBox from '@/components/WarningDialogBox.vue'
 import { useNodeStore, type Node } from '@/stores/node'
-import { useProfileStore } from '@/stores/profile'
-import { transfer } from '@/utils'
-import { ref, watchEffect } from 'vue'
-import { useRoute } from 'vue-router'
+import ky from 'ky'
+import useSWRV from 'swrv'
+import { ref } from 'vue'
 
-const route = useRoute()
+const { data: nodes, mutate } = useSWRV<Node[]>('/api/nodes')
+const isOpen = ref(false)
+const profileName = ref('')
 const { toInsertNode, toUpdateNode } = useNodeStore()
-const { toUpdateProfile } = useProfileStore()
-const nodes = ref<Node[]>([])
-const page = ref(
-  ((page) => (Number.isNaN(page) ? 1 : page))(Number(route.query['page']))
-)
 
-watchEffect(async () => {
-  const res = await transfer<Node[]>(
-    `/api/nodes?limit=10&skip=${(page.value - 1) * 10}`
-  )
-  nodes.value = Array.isArray(res) ? res : []
-})
+function openDialog(name: string) {
+  profileName.value = name
+  isOpen.value = true
+}
+
+function deleteProfile() {
+  ky.delete(`/api/profile/${profileName.value}`).then(() => mutate())
+}
 </script>
 
 <template>
@@ -32,7 +31,7 @@ watchEffect(async () => {
         <a href="#" role="button" @click="toInsertNode">Add</a>
       </li>
     </template>
-    <table v-if="nodes.length !== 0">
+    <table v-if="nodes?.length !== 0">
       <thead>
         <tr>
           <th scope="col">Name</th>
@@ -49,7 +48,7 @@ watchEffect(async () => {
               type="button"
               v-for="profileName in node.profileNames"
               :key="profileName"
-              @click.stop="toUpdateProfile(profileName)"
+              @click.stop="openDialog(profileName)"
             >
               {{ profileName }}
             </button>
@@ -59,7 +58,7 @@ watchEffect(async () => {
     </table>
     <div v-else class="text-center">Nothing here</div>
   </BaseLayout>
-  <nav>
+  <!-- <nav>
     <ul>
       <li :class="page <= 1 ? 'disabled' : ''">
         <a @click="page--">Previous</a>
@@ -68,5 +67,11 @@ watchEffect(async () => {
         <a @click="page++">Next</a>
       </li>
     </ul>
-  </nav>
+  </nav> -->
+  <WarningDialogBox
+    :name="profileName"
+    :is-open="isOpen"
+    @delete="deleteProfile"
+    @close="isOpen = false"
+  />
 </template>

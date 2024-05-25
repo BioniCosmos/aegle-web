@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import BaseLayout from '@/components/BaseLayout.vue'
-import { useProfileStore } from '@/stores/profile'
 import { getNextDate, type User } from '@/stores/user'
 import { transfer } from '@/utils'
 import { ref, shallowRef, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const { toUpdateProfile } = useProfileStore()
 const users = shallowRef<User[]>([])
 const page = ref(
   ((page) => (Number.isNaN(page) ? 1 : page))(Number(route.query['page']))
@@ -63,7 +61,6 @@ watchEffect(async () => {
               type="button"
               v-for="profileName in user.profileNames"
               :key="profileName"
-              @click.stop="toUpdateProfile(profileName)"
             >
               {{ profileName }}
             </button>

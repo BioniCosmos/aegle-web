@@ -20,6 +20,11 @@ const router = createRouter({
     {
       path: '/profile',
       component: () => import('@/views/ProfileEditorView.vue'),
+      beforeEnter: (to, from) => {
+        if (!to.query.nodeId) {
+          return from
+        }
+      },
     },
     {
       path: '/users',
