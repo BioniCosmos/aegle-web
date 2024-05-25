@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BaseLayout from '@/components/BaseLayout.vue'
-import { getNextDate, type User } from '@/stores/user'
+import { getNextDate, type User } from '@/type/user'
 import { transfer } from '@/utils'
 import { ref, shallowRef, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'

@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import BaseLayout from '@/components/BaseLayout.vue'
-import WarningDialogBox from '@/components/WarningDialogBox.vue'
+import WarningDialog from '@/components/WarningDialog.vue'
 import { useMessage } from '@/stores/common'
-import type { Profile } from '@/stores/profile'
-import { User, getNextDate, parseUser } from '@/stores/user'
+import type { Profile } from '@/type/profile'
+import { User, getNextDate, parseUser } from '@/type/user'
 import ky from 'ky'
 import 'temporal-polyfill/global'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-
-defineEmits<{ (event: 'delete'): void }>()
 
 const id = useRoute().params.id as string
 const isUpdate = computed(() => id !== '')
@@ -28,7 +26,7 @@ onMounted(() => {
 })
 
 const nextDate = computed(() => getNextDate(user.value))
-const isOpen = ref(false)
+const open = ref(false)
 
 function extend() {
   const updatedUser = { ...user.value, cycles: user.value.cycles + 1 }
@@ -102,7 +100,7 @@ function generate() {
         <a href="#" role="button" @click="extend">Extend</a>
       </li>
       <li>
-        <a href="#" role="button" @click="isOpen = true">Remove the user</a>
+        <a href="#" role="button" @click="open = true">Remove the user</a>
       </li>
     </template>
     <template #operations v-else>
@@ -163,10 +161,10 @@ function generate() {
       <button v-if="!isUpdate">Submit</button>
     </form>
   </BaseLayout>
-  <WarningDialogBox
+  <WarningDialog
     :name="user.name"
-    :is-open="isOpen"
+    :open="open"
     @delete="ky.delete(`/api/user/${id}`).then(() => $router.replace('/users'))"
-    @close="isOpen = false"
+    @close="open = false"
   />
 </template>

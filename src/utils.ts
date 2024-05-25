@@ -1,4 +1,4 @@
-import { parseUser } from './stores/user'
+import { parseUser } from './type/user'
 
 export interface DefaultResponse {
   code: number

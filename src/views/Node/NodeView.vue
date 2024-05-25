@@ -1,23 +1,29 @@
 <script setup lang="ts">
 import BaseLayout from '@/components/BaseLayout.vue'
-import WarningDialogBox from '@/components/WarningDialogBox.vue'
+import WarningDialog from '@/components/WarningDialog.vue'
 import { useNodeStore, type Node } from '@/stores/node'
 import ky from 'ky'
 import useSWRV from 'swrv'
 import { ref } from 'vue'
 
 const { data: nodes, mutate } = useSWRV<Node[]>('/api/nodes')
-const isOpen = ref(false)
+const open = ref(false)
 const profileName = ref('')
 const { toInsertNode, toUpdateNode } = useNodeStore()
 
 function openDialog(name: string) {
   profileName.value = name
-  isOpen.value = true
+  open.value = true
+}
+
+function closeDialog() {
+  open.value = false
 }
 
 function deleteProfile() {
-  ky.delete(`/api/profile/${profileName.value}`).then(() => mutate())
+  ky.delete(`/api/profile/${profileName.value}`)
+    .then(() => mutate())
+    .then(closeDialog)
 }
 </script>
 
@@ -68,10 +74,10 @@ function deleteProfile() {
       </li>
     </ul>
   </nav> -->
-  <WarningDialogBox
+  <WarningDialog
     :name="profileName"
-    :is-open="isOpen"
+    :open="open"
     @delete="deleteProfile"
-    @close="isOpen = false"
+    @close="closeDialog"
   />
 </template>

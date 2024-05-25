@@ -1,14 +1,9 @@
 <script setup lang="ts">
 import BaseLayout from '@/components/BaseLayout.vue'
-import WarningDialogBox from '@/components/WarningDialogBox.vue'
+import WarningDialog from '@/components/WarningDialog.vue'
 import { useNodeStore } from '@/stores/node'
 import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
-
-defineEmits<{
-  (event: 'delete'): void
-  (event: 'close'): void
-}>()
 
 const nodeStore = useNodeStore()
 const { node, isToInsertNode } = storeToRefs(nodeStore)
@@ -17,7 +12,7 @@ const submit = computed(() => (isToInsertNode.value ? insertNode : updateNode))
 const title = computed(() =>
   isToInsertNode.value ? 'Adding a node' : 'Editing a node'
 )
-const isOpen = ref(false)
+const open = ref(false)
 </script>
 
 <template>
@@ -32,7 +27,7 @@ const isOpen = ref(false)
         </RouterLink>
       </li>
       <li>
-        <a href="#" role="button" @click="isOpen = true">Remove the node</a>
+        <a href="#" role="button" @click="open = true">Remove the node</a>
       </li>
     </template>
     <form @submit.prevent="submit">
@@ -52,10 +47,10 @@ const isOpen = ref(false)
       <button>Submit</button>
     </form>
   </BaseLayout>
-  <WarningDialogBox
+  <WarningDialog
     :name="node.name"
-    :is-open="isOpen"
+    :open="open"
     @delete="deleteNode"
-    @close="isOpen = false"
+    @close="open = false"
   />
 </template>
