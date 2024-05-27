@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import BaseLayout from '@/components/BaseLayout.vue'
+import PaginationBar from '@/components/PaginationBar.vue'
 import WarningDialog from '@/components/WarningDialog.vue'
 import { useNodeStore, type Node } from '@/stores/node'
+import type { Pagination } from '@/type/pagination'
 import ky from 'ky'
 import useSWRV from 'swrv'
 import { ref } from 'vue'
 
-const { data: nodes, mutate } = useSWRV<Node[]>('/api/nodes')
+const page = ref(1)
+const { data: pagination, mutate } = useSWRV<Pagination<Node>>(
+  () => `/api/nodes?page=${page.value}`
+)
 const open = ref(false)
 const profileName = ref('')
 const { toInsertNode, toUpdateNode } = useNodeStore()
@@ -37,7 +42,7 @@ function deleteProfile() {
         <a href="#" role="button" @click="toInsertNode">Add</a>
       </li>
     </template>
-    <table v-if="nodes?.length !== 0">
+    <table v-if="pagination?.items.length !== 0">
       <thead>
         <tr>
           <th scope="col">Name</th>
@@ -46,7 +51,11 @@ function deleteProfile() {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="node in nodes" :key="node.id" @click="toUpdateNode(node)">
+        <tr
+          v-for="node in pagination?.items"
+          :key="node.id"
+          @click="toUpdateNode(node)"
+        >
           <td>{{ node.name }}</td>
           <td>{{ node.apiAddress }}</td>
           <td>
@@ -64,16 +73,11 @@ function deleteProfile() {
     </table>
     <div v-else class="text-center">Nothing here</div>
   </BaseLayout>
-  <!-- <nav>
-    <ul>
-      <li :class="page <= 1 ? 'disabled' : ''">
-        <a @click="page--">Previous</a>
-      </li>
-      <li>
-        <a @click="page++">Next</a>
-      </li>
-    </ul>
-  </nav> -->
+  <PaginationBar
+    :page="page"
+    @toPrevious="page = pagination?.previousPage!"
+    @toNext="page = pagination?.nextPage!"
+  />
   <WarningDialog
     :name="profileName"
     :open="open"

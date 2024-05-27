@@ -8,7 +8,7 @@ export class User {
   uuid = ''
   flow = ''
   security = ''
-  profileNames = Array.of<string>()
+  profiles: { name: string }[] = []
 }
 
 export const getNextDate = (user: User) =>

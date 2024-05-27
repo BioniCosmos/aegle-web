@@ -41,9 +41,9 @@ function extend() {
 function update(event: Event) {
   const input = event.target as HTMLInputElement
   const { checked, value } = input
-  user.value.profileNames = checked
-    ? [...user.value.profileNames, value]
-    : user.value.profileNames.filter((profileId) => profileId !== value)
+  user.value.profiles = checked
+    ? [...user.value.profiles, { name: value }]
+    : user.value.profiles.filter(({ name }) => name !== value)
   if (isUpdate.value) {
     useMessage(`/api/user`, 'PATCH', {
       id,
@@ -152,7 +152,10 @@ function generate() {
           <input
             type="checkbox"
             :value="profile.name"
-            :checked="user.profileNames.includes(profile.name)"
+            :checked="
+              user.profiles.find(({ name }) => name === profile.name) !==
+              undefined
+            "
             @change="update"
           />
           {{ profile.name }}

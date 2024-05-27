@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import BaseLayout from '@/components/BaseLayout.vue'
-import { getNextDate, type User } from '@/type/user'
-import { transfer } from '@/utils'
-import { ref, shallowRef, watchEffect } from 'vue'
-import { useRoute } from 'vue-router'
+import PaginationBar from '@/components/PaginationBar.vue'
+import type { Pagination } from '@/type/pagination'
+import { getNextDate, parseUser, type User } from '@/type/user'
+import ky from 'ky'
+import useSWRV from 'swrv'
+import { ref } from 'vue'
 
-const route = useRoute()
-const users = shallowRef<User[]>([])
-const page = ref(
-  ((page) => (Number.isNaN(page) ? 1 : page))(Number(route.query['page']))
+const page = ref(1)
+const { data: pagination } = useSWRV<Pagination<User>>(
+  () => `/api/users?page=${page.value}`,
+  (url) => ky(url, { parseJson: parseUser }).json()
 )
 
 const isPaid = (user: User) =>
@@ -16,13 +18,6 @@ const isPaid = (user: User) =>
     getNextDate(user),
     Temporal.Now.zonedDateTimeISO()
   ) !== -1
-
-watchEffect(async () => {
-  const res = await transfer<User[]>(
-    `/api/users?limit=10&skip=${(page.value - 1) * 10}`
-  )
-  users.value = res !== null && typeof res !== 'string' ? res : []
-})
 </script>
 
 <template>
@@ -35,7 +30,7 @@ watchEffect(async () => {
         <RouterLink to="/user" role="button">Add</RouterLink>
       </li>
     </template>
-    <table v-if="users.length !== 0">
+    <table v-if="pagination?.items.length !== 0">
       <thead>
         <tr>
           <th scope="col">Name</th>
@@ -47,7 +42,7 @@ watchEffect(async () => {
       </thead>
       <tbody>
         <tr
-          v-for="user in users"
+          v-for="user in pagination?.items"
           :key="user.id"
           @click="$router.push(`/user/${user.id}`)"
           :style="{ backgroundColor: isPaid(user) ? 'unset' : 'red' }"
@@ -57,12 +52,8 @@ watchEffect(async () => {
           <td>{{ user.level }}</td>
           <td>{{ getNextDate(user).toPlainDate() }}</td>
           <td>
-            <button
-              type="button"
-              v-for="profileName in user.profileNames"
-              :key="profileName"
-            >
-              {{ profileName }}
+            <button type="button" v-for="{ name } in user.profiles" :key="name">
+              {{ name }}
             </button>
           </td>
         </tr>
@@ -70,4 +61,9 @@ watchEffect(async () => {
     </table>
     <div v-else class="text-center">Nothing here</div>
   </BaseLayout>
+  <PaginationBar
+    :page="page"
+    @toPrevious="page = pagination?.previousPage!"
+    @toNext="page = pagination?.nextPage!"
+  />
 </template>
