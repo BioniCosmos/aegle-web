@@ -14,7 +14,7 @@ const router = createRouter({
       component: () => import('@/views/Node/NodeView.vue'),
     },
     {
-      path: '/node',
+      path: '/node/:id?',
       component: () => import('@/views/Node/NodeEditorView.vue'),
     },
     {

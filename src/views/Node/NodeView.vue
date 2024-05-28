@@ -2,7 +2,7 @@
 import BaseLayout from '@/components/BaseLayout.vue'
 import PaginationBar from '@/components/PaginationBar.vue'
 import WarningDialog from '@/components/WarningDialog.vue'
-import { useNodeStore, type Node } from '@/stores/node'
+import type { Node } from '@/type/node'
 import type { Pagination } from '@/type/pagination'
 import ky from 'ky'
 import useSWRV from 'swrv'
@@ -14,7 +14,6 @@ const { data: pagination, mutate } = useSWRV<Pagination<Node>>(
 )
 const open = ref(false)
 const profileName = ref('')
-const { toInsertNode, toUpdateNode } = useNodeStore()
 
 function openDialog(name: string) {
   profileName.value = name
@@ -39,7 +38,7 @@ function deleteProfile() {
     </template>
     <template #operations>
       <li>
-        <a href="#" role="button" @click="toInsertNode">Add</a>
+        <RouterLink to="/node" role="button">Add</RouterLink>
       </li>
     </template>
     <table v-if="pagination?.items.length !== 0">
@@ -54,7 +53,7 @@ function deleteProfile() {
         <tr
           v-for="node in pagination?.items"
           :key="node.id"
-          @click="toUpdateNode(node)"
+          @click="$router.push(`/node/${node.id}`)"
         >
           <td>{{ node.name }}</td>
           <td>{{ node.apiAddress }}</td>

@@ -1,28 +1,43 @@
 <script setup lang="ts">
 import BaseLayout from '@/components/BaseLayout.vue'
 import WarningDialog from '@/components/WarningDialog.vue'
-import { useNodeStore } from '@/stores/node'
-import { storeToRefs } from 'pinia'
+import { Node } from '@/type/node'
+import ky from 'ky'
 import { computed, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
-const nodeStore = useNodeStore()
-const { node, isToInsertNode } = storeToRefs(nodeStore)
-const { insertNode, updateNode, deleteNode } = nodeStore
-const submit = computed(() => (isToInsertNode.value ? insertNode : updateNode))
-const title = computed(() =>
-  isToInsertNode.value ? 'Adding a node' : 'Editing a node'
-)
+const router = useRouter()
+const id = useRoute().params.id as string
+const isUpdate = computed(() => id !== '')
+
+const node = ref(new Node())
+if (isUpdate.value) {
+  ky(`/api/node/${id}`)
+    .json<Node>()
+    .then((value) => (node.value = value))
+}
+
 const open = ref(false)
+
+function submit() {
+  ky[isUpdate.value ? 'put' : 'post']('/api/node', { json: node.value }).then(
+    () => router.push('/nodes')
+  )
+}
+
+function deleteNode() {
+  ky.delete(`/api/node/${id}`).then(() => router.push('/nodes'))
+}
 </script>
 
 <template>
   <BaseLayout>
     <template #title>
-      <h3 class="mb-0">{{ title }}</h3>
+      <h3 class="mb-0">{{ isUpdate ? 'Editing a node' : 'Adding a node' }}</h3>
     </template>
-    <template #operations v-if="!isToInsertNode">
+    <template #operations v-if="isUpdate">
       <li>
-        <RouterLink :to="`/profile?nodeId=${node.id}`" role="button">
+        <RouterLink :to="`/profile?nodeId=${id}`" role="button">
           Add a profile
         </RouterLink>
       </li>
