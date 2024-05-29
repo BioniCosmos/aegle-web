@@ -7,8 +7,9 @@ import { User, getNextDate, parseUser } from '@/type/user'
 import ky from 'ky'
 import 'temporal-polyfill/global'
 import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
+const router = useRouter()
 const id = useRoute().params.id as string
 const isUpdate = computed(() => id !== '')
 
@@ -27,6 +28,10 @@ onMounted(() => {
 
 const nextDate = computed(() => getNextDate(user.value))
 const open = ref(false)
+
+function close() {
+  open.value = false
+}
 
 function extend() {
   const updatedUser = { ...user.value, cycles: user.value.cycles + 1 }
@@ -80,6 +85,12 @@ function generate() {
   user.value.uuid = crypto.randomUUID()
   user.value.flow = 'xtls-rprx-vision'
   user.value.security = 'auto'
+}
+
+function deleteUser() {
+  ky.delete(`/api/user/${id}`)
+    .then(close)
+    .then(() => router.replace('/users'))
 }
 </script>
 
@@ -167,7 +178,7 @@ function generate() {
   <WarningDialog
     :name="user.name"
     :open="open"
-    @delete="ky.delete(`/api/user/${id}`).then(() => $router.replace('/users'))"
-    @close="open = false"
+    @delete="deleteUser"
+    @close="close"
   />
 </template>

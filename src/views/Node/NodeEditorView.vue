@@ -19,6 +19,10 @@ if (isUpdate.value) {
 
 const open = ref(false)
 
+function close() {
+  open.value = false
+}
+
 function submit() {
   ky[isUpdate.value ? 'put' : 'post']('/api/node', { json: node.value }).then(
     () => router.push('/nodes')
@@ -26,7 +30,9 @@ function submit() {
 }
 
 function deleteNode() {
-  ky.delete(`/api/node/${id}`).then(() => router.push('/nodes'))
+  ky.delete(`/api/node/${id}`)
+    .then(close)
+    .then(() => router.push('/nodes'))
 }
 </script>
 
@@ -66,6 +72,6 @@ function deleteNode() {
     :name="node.name"
     :open="open"
     @delete="deleteNode"
-    @close="open = false"
+    @close="close"
   />
 </template>
