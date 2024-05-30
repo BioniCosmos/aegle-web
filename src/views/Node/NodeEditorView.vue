@@ -25,7 +25,7 @@ function close() {
 
 function submit() {
   ky[isUpdate.value ? 'put' : 'post']('/api/node', { json: node.value }).then(
-    () => router.push('/nodes')
+    () => router.push('/nodes'),
   )
 }
 

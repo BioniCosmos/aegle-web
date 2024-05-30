@@ -1,16 +1,48 @@
 <script setup lang="ts">
-import BaseLayout from '@/components/BaseLayout.vue'
-import PaginationBar from '@/components/PaginationBar.vue'
 import WarningDialog from '@/components/WarningDialog.vue'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
+import {
+  PaginationEllipsis,
+  PaginationFirst,
+  PaginationLast,
+  PaginationList,
+  PaginationListItem,
+  PaginationNext,
+  PaginationPrev,
+  Pagination as PaginationRoot,
+} from '@/components/ui/pagination'
+import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import type { Node } from '@/type/node'
 import type { Pagination } from '@/type/pagination'
 import ky from 'ky'
+import { ChevronsUpDown } from 'lucide-vue-next'
 import useSWRV from 'swrv'
 import { ref } from 'vue'
 
 const page = ref(1)
 const { data: pagination, mutate } = useSWRV<Pagination<Node>>(
-  () => `/api/nodes?page=${page.value}`
+  () => `/api/nodes?page=${page.value}`,
+  (url) => ky(url).json(),
 )
 const open = ref(false)
 const profileName = ref('')
@@ -32,55 +64,113 @@ function deleteProfile() {
 </script>
 
 <template>
-  <BaseLayout>
-    <template #title>
-      <h2 class="mb-0">Nodes</h2>
-    </template>
-    <template #operations>
-      <li>
-        <RouterLink to="/node" role="button">Add</RouterLink>
-      </li>
-    </template>
-    <table v-if="pagination?.items.length !== 0">
-      <thead>
-        <tr>
-          <th scope="col">Name</th>
-          <th scope="col">API address</th>
-          <th scope="col">Profiles</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="node in pagination?.items"
-          :key="node.id"
-          @click="$router.push(`/node/${node.id}`)"
-        >
-          <td>{{ node.name }}</td>
-          <td>{{ node.apiAddress }}</td>
-          <td>
-            <button
-              type="button"
-              v-for="profileName in node.profileNames"
-              :key="profileName"
-              @click.stop="openDialog(profileName)"
+  <Card class="xl:col-span-2">
+    <CardHeader class="flex flex-row items-center">
+      <CardTitle>Nodes</CardTitle>
+      <Button as-child size="sm" class="ml-auto">
+        <RouterLink to="/node">Add</RouterLink>
+      </Button>
+    </CardHeader>
+    <CardContent>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead class="font-semibold">Name</TableHead>
+            <TableHead class="font-semibold">API Address</TableHead>
+            <TableHead class="font-semibold">Profiles</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody v-if="pagination === undefined">
+          <TableRow v-for="i in 5" :key="i">
+            <TableCell>
+              <Skeleton class="h-3.5 w-[8ch]" />
+            </TableCell>
+            <TableCell>
+              <Skeleton class="h-3.5 w-full" />
+            </TableCell>
+            <TableCell>
+              <Skeleton class="h-3.5 w-[300px]" />
+            </TableCell>
+          </TableRow>
+        </TableBody>
+        <TableBody v-else>
+          <TableRow v-if="pagination.items.length === 0">
+            <TableCell colspan="3" class="text-center text-muted-foreground">
+              Nothing here
+            </TableCell>
+          </TableRow>
+          <TableRow
+            v-else
+            v-for="node in pagination.items"
+            :key="node.id"
+            @click="$router.push(`/node/${node.id}`)"
+          >
+            <TableCell>{{ node.name }}</TableCell>
+            <TableCell>{{ node.apiAddress }}</TableCell>
+            <TableCell @click.stop>
+              <Collapsible class="w-[300px] space-y-2">
+                <div class="flex items-center justify-between space-x-4 px-4">
+                  <h4 class="text-sm font-semibold">
+                    {{ node.profileNames.length }} profiles
+                  </h4>
+                  <CollapsibleTrigger
+                    as-child
+                    v-if="node.profileNames.length !== 0"
+                  >
+                    <Button variant="ghost" size="sm" class="w-9 p-0">
+                      <ChevronsUpDown class="h-4 w-4" />
+                      <span class="sr-only">Toggle</span>
+                    </Button>
+                  </CollapsibleTrigger>
+                </div>
+                <CollapsibleContent class="space-y-2 mx-6">
+                  <button
+                    class="rounded-md border px-4 py-3 font-mono text-sm w-full hover:bg-accent hover:text-accent-foreground"
+                    v-for="profileName in node.profileNames"
+                    :key="profileName"
+                    @click="openDialog(profileName)"
+                  >
+                    {{ profileName }}
+                  </button>
+                </CollapsibleContent>
+              </Collapsible>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </CardContent>
+    <CardFooter
+      v-if="pagination !== undefined && pagination.items.length !== 0"
+    >
+      <PaginationRoot
+        v-model:page="page"
+        :total="pagination.total"
+        class="mx-auto"
+      >
+        <PaginationList v-slot="{ items }" class="flex items-center gap-1">
+          <PaginationFirst />
+          <PaginationPrev />
+          <template v-for="(item, index) in items">
+            <PaginationListItem
+              v-if="item.type === 'page'"
+              :key="index"
+              :value="item.value"
+              as-child
             >
-              {{ profileName }}
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div v-else class="text-center">Nothing here</div>
-  </BaseLayout>
-  <PaginationBar
-    :page="page"
-    @toPrevious="page = pagination?.previousPage!"
-    @toNext="page = pagination?.nextPage!"
-  />
-  <WarningDialog
-    :name="profileName"
-    :open="open"
-    @delete="deleteProfile"
-    @close="closeDialog"
-  />
+              <Button
+                class="w-10 h-10 p-0"
+                :variant="item.value === page ? 'default' : 'outline'"
+              >
+                {{ item.value }}
+              </Button>
+            </PaginationListItem>
+            <PaginationEllipsis v-else :key="item.type" :index="index" />
+          </template>
+          <PaginationNext />
+          <PaginationLast />
+        </PaginationList>
+      </PaginationRoot>
+    </CardFooter>
+  </Card>
+  <WarningDialog v-model="open" :name="profileName" @confirm="deleteProfile" />
 </template>

@@ -16,5 +16,5 @@ export const getNextDate = (user: User) =>
 
 export const parseUser = (text: string) =>
   JSON.parse(text, (key, value) =>
-    key.endsWith('Date') ? Temporal.ZonedDateTime.from(value) : value
+    key.endsWith('Date') ? Temporal.ZonedDateTime.from(value) : value,
   )

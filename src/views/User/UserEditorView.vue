@@ -122,7 +122,7 @@ function deleteUser() {
     <form
       @submit.prevent="
         ky.post('/api/user', { json: { ...user, nextDate } }).then(() =>
-          $router.replace('/users')
+          $router.replace('/users'),
         )
       "
     >

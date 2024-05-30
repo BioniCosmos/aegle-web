@@ -1,4 +1,10 @@
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 import { parseUser } from './type/user'
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
 
 export interface DefaultResponse {
   code: number
@@ -8,7 +14,7 @@ export interface DefaultResponse {
 export async function transfer<T = DefaultResponse>(
   input: RequestInfo | URL,
   method: string = 'GET',
-  data?: unknown
+  data?: unknown,
 ) {
   const init: RequestInit = {
     method,

@@ -13,11 +13,18 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@vueuse/core": "^10.10.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
     "ky": "^1.2.4",
-    "naive-ui": "^2.38.0",
+    "lucide-vue-next": "^0.379.0",
     "pinia": "^2.1.7",
+    "radix-vue": "^1.8.2",
     "swrv": "^1.0.4",
+    "tailwind-merge": "^2.3.0",
+    "tailwindcss-animate": "^1.0.7",
     "temporal-polyfill": "^0.2.4",
+    "vaul-vue": "^0.1.2",
     "vue": "^3.4.19",
     "vue-router": "^4.3.0"
   },

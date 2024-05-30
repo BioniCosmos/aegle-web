@@ -10,13 +10,13 @@ import { ref } from 'vue'
 const page = ref(1)
 const { data: pagination } = useSWRV<Pagination<User>>(
   () => `/api/users?page=${page.value}`,
-  (url) => ky(url, { parseJson: parseUser }).json()
+  (url) => ky(url, { parseJson: parseUser }).json(),
 )
 
 const isPaid = (user: User) =>
   Temporal.ZonedDateTime.compare(
     getNextDate(user),
-    Temporal.Now.zonedDateTimeISO()
+    Temporal.Now.zonedDateTimeISO(),
   ) !== -1
 </script>
 
