@@ -19,10 +19,9 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer'
 import { useMediaQuery } from '@vueuse/core'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
-const props = defineProps<{ name: string }>()
-defineEmits<{ confirm: [] }>()
+const props = defineProps<{ name: string; onConfirm: () => Promise<unknown> }>()
 const open = defineModel<boolean>()
 
 const isDesktop = useMediaQuery('(min-width: 768px)')
@@ -33,6 +32,12 @@ const description = computed(
 <span class="font-semibold text-primary">${props.name}</span>
 will be permanently deleted.`,
 )
+
+const submitting = ref(false)
+const confirm = () => {
+  submitting.value = true
+  props.onConfirm().then(() => (submitting.value = false))
+}
 </script>
 
 <template>
@@ -46,7 +51,7 @@ will be permanently deleted.`,
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel>Cancel</AlertDialogCancel>
-        <Button variant="destructive" @click="$emit('confirm')">
+        <Button variant="destructive" :disabled="submitting" @click="confirm">
           Continue
         </Button>
       </AlertDialogFooter>
@@ -61,7 +66,7 @@ will be permanently deleted.`,
         </DrawerDescription>
       </DrawerHeader>
       <DrawerFooter class="pt-2">
-        <Button variant="destructive" @click="$emit('confirm')">
+        <Button variant="destructive" :disabled="submitting" @click="confirm">
           Continue
         </Button>
         <DrawerClose as-child>

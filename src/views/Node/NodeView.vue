@@ -52,19 +52,15 @@ function openDialog(name: string) {
   open.value = true
 }
 
-function closeDialog() {
-  open.value = false
-}
-
-function deleteProfile() {
-  ky.delete(`/api/profile/${profileName.value}`)
+const deleteProfile = () =>
+  ky
+    .delete(`/api/profile/${profileName.value}`)
     .then(() => mutate())
-    .then(closeDialog)
-}
+    .then(() => (open.value = false))
 </script>
 
 <template>
-  <Card class="xl:col-span-2">
+  <Card>
     <CardHeader class="flex flex-row items-center">
       <CardTitle>Nodes</CardTitle>
       <Button as-child size="sm" class="ml-auto">

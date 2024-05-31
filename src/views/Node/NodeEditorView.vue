@@ -1,77 +1,73 @@
 <script setup lang="ts">
-import BaseLayout from '@/components/BaseLayout.vue'
 import WarningDialog from '@/components/WarningDialog.vue'
+import { AutoForm } from '@/components/ui/auto-form'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Node } from '@/type/node'
+import { toTypedSchema } from '@vee-validate/zod'
 import ky from 'ky'
-import { computed, ref } from 'vue'
+import { useForm } from 'vee-validate'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { z } from 'zod'
 
 const router = useRouter()
 const id = useRoute().params.id as string
 const isUpdate = computed(() => id !== '')
 
-const node = ref(new Node())
-if (isUpdate.value) {
-  ky(`/api/node/${id}`)
-    .json<Node>()
-    .then((value) => (node.value = value))
-}
-
-const open = ref(false)
-
-function close() {
-  open.value = false
-}
-
-function submit() {
-  ky[isUpdate.value ? 'put' : 'post']('/api/node', { json: node.value }).then(
+const schema = z.object({
+  name: z.string().min(1),
+  apiAddress: z.string().min(1),
+})
+const form = useForm({ validationSchema: toTypedSchema(schema) })
+onMounted(() => {
+  if (isUpdate.value) {
+    ky(`/api/node/${id}`).json<Node>().then(form.setValues)
+  }
+})
+const submit = () =>
+  ky[isUpdate.value ? 'put' : 'post']('/api/node', { json: form.values }).then(
     () => router.push('/nodes'),
   )
-}
 
-function deleteNode() {
-  ky.delete(`/api/node/${id}`)
-    .then(close)
+const open = ref(false)
+const deleteNode = () =>
+  ky
+    .delete(`/api/node/${id}`)
+    .then(() => (open.value = false))
     .then(() => router.push('/nodes'))
-}
 </script>
 
 <template>
-  <BaseLayout>
-    <template #title>
-      <h3 class="mb-0">{{ isUpdate ? 'Editing a node' : 'Adding a node' }}</h3>
-    </template>
-    <template #operations v-if="isUpdate">
-      <li>
-        <RouterLink :to="`/profile?nodeId=${id}`" role="button">
-          Add a profile
-        </RouterLink>
-      </li>
-      <li>
-        <a href="#" role="button" @click="open = true">Remove the node</a>
-      </li>
-    </template>
-    <form @submit.prevent="submit">
-      <label for="name">
-        Name
-        <input type="text" id="name" required v-model="node.name" />
-      </label>
-      <label for="api-address">
-        API address
-        <input
-          type="text"
-          id="api-address"
-          required
-          v-model="node.apiAddress"
-        />
-      </label>
-      <button>Submit</button>
-    </form>
-  </BaseLayout>
+  <Card>
+    <CardHeader class="flex flex-row items-center justify-between">
+      <CardTitle>Node</CardTitle>
+      <div v-if="isUpdate" class="space-x-4">
+        <Button size="sm" as-child variant="default">
+          <RouterLink :to="`/profile?nodeId=${id}`">Add a profile</RouterLink>
+        </Button>
+        <Button size="sm" variant="secondary" @click="open = true">
+          Remove the node
+        </Button>
+      </div>
+    </CardHeader>
+    <CardContent>
+      <AutoForm
+        class="space-y-6"
+        :schema="schema"
+        :field-config="{ apiAddress: { label: 'API Address' } }"
+        :form="form"
+        @submit="submit"
+        v-slot="{ submitting }"
+      >
+        <Button :disabled="submitting">Submit</Button>
+      </AutoForm>
+    </CardContent>
+  </Card>
   <WarningDialog
-    :name="node.name"
-    :open="open"
-    @delete="deleteNode"
-    @close="close"
+    v-if="form.values.name !== undefined"
+    v-model="open"
+    :name="form.values.name"
+    @confirm="deleteNode"
   />
 </template>
