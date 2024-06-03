@@ -1,18 +1,43 @@
 <script setup lang="ts">
-defineProps<{ page: number }>()
-defineEmits<{ toPrevious: []; toNext: [] }>()
+import { Button } from '@/components/ui/button'
+import {
+  Pagination,
+  PaginationEllipsis,
+  PaginationFirst,
+  PaginationLast,
+  PaginationList,
+  PaginationListItem,
+  PaginationNext,
+  PaginationPrev,
+} from '@/components/ui/pagination'
+
+defineProps<{ total: number }>()
+const page = defineModel<number>()
 </script>
 
 <template>
-  <nav>
-    <ul>
-      <li>
-        <a href="#" @click="$emit('toPrevious')">Previous</a>
-      </li>
-      <li>{{ page }}</li>
-      <li>
-        <a href="#" @click="$emit('toNext')">Next</a>
-      </li>
-    </ul>
-  </nav>
+  <Pagination v-model:page="page" :total="total" class="mx-auto">
+    <PaginationList v-slot="{ items }" class="flex items-center gap-1">
+      <PaginationFirst />
+      <PaginationPrev />
+      <template v-for="(item, index) in items">
+        <PaginationListItem
+          v-if="item.type === 'page'"
+          :key="index"
+          :value="item.value"
+          as-child
+        >
+          <Button
+            class="w-10 h-10 p-0"
+            :variant="item.value === page ? 'default' : 'outline'"
+          >
+            {{ item.value }}
+          </Button>
+        </PaginationListItem>
+        <PaginationEllipsis v-else :key="item.type" :index="index" />
+      </template>
+      <PaginationNext />
+      <PaginationLast />
+    </PaginationList>
+  </Pagination>
 </template>

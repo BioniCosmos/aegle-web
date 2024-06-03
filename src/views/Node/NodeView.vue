@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import PaginationBar from '@/components/PaginationBar.vue'
 import WarningDialog from '@/components/WarningDialog.vue'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,16 +14,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
-import {
-  PaginationEllipsis,
-  PaginationFirst,
-  PaginationLast,
-  PaginationList,
-  PaginationListItem,
-  PaginationNext,
-  PaginationPrev,
-  Pagination as PaginationRoot,
-} from '@/components/ui/pagination'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
@@ -138,34 +129,7 @@ const deleteProfile = () =>
     <CardFooter
       v-if="pagination !== undefined && pagination.items.length !== 0"
     >
-      <PaginationRoot
-        v-model:page="page"
-        :total="pagination.total"
-        class="mx-auto"
-      >
-        <PaginationList v-slot="{ items }" class="flex items-center gap-1">
-          <PaginationFirst />
-          <PaginationPrev />
-          <template v-for="(item, index) in items">
-            <PaginationListItem
-              v-if="item.type === 'page'"
-              :key="index"
-              :value="item.value"
-              as-child
-            >
-              <Button
-                class="w-10 h-10 p-0"
-                :variant="item.value === page ? 'default' : 'outline'"
-              >
-                {{ item.value }}
-              </Button>
-            </PaginationListItem>
-            <PaginationEllipsis v-else :key="item.type" :index="index" />
-          </template>
-          <PaginationNext />
-          <PaginationLast />
-        </PaginationList>
-      </PaginationRoot>
+      <PaginationBar :total="pagination.total" v-model="page" />
     </CardFooter>
   </Card>
   <WarningDialog v-model="open" :name="profileName" @confirm="deleteProfile" />

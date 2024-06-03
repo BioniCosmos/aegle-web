@@ -1,69 +1,104 @@
 <script setup lang="ts">
-import BaseLayout from '@/components/BaseLayout.vue'
 import PaginationBar from '@/components/PaginationBar.vue'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import type { Pagination } from '@/type/pagination'
-import { getNextDate, parseUser, type User } from '@/type/user'
+import { parseUser, type User } from '@/type/user'
 import ky from 'ky'
 import useSWRV from 'swrv'
 import { ref } from 'vue'
 
+type FullUser = User & { nextDate: Temporal.ZonedDateTime }
+
 const page = ref(1)
-const { data: pagination } = useSWRV<Pagination<User>>(
+const { data: pagination } = useSWRV<Pagination<FullUser>>(
   () => `/api/users?page=${page.value}`,
   (url) => ky(url, { parseJson: parseUser }).json(),
 )
 
-const isPaid = (user: User) =>
+const isPaid = (user: FullUser) =>
   Temporal.ZonedDateTime.compare(
-    getNextDate(user),
+    user.nextDate,
     Temporal.Now.zonedDateTimeISO(),
   ) !== -1
 </script>
 
 <template>
-  <BaseLayout>
-    <template #title>
-      <h2 class="mb-0">Users</h2>
-    </template>
-    <template #operations>
-      <li>
-        <RouterLink to="/user" role="button">Add</RouterLink>
-      </li>
-    </template>
-    <table v-if="pagination?.items.length !== 0">
-      <thead>
-        <tr>
-          <th scope="col">Name</th>
-          <th scope="col">Email</th>
-          <th scope="col">Level</th>
-          <th scope="col">Billing Date</th>
-          <th scope="col">Operations</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="user in pagination?.items"
-          :key="user.id"
-          @click="$router.push(`/user/${user.id}`)"
-          :style="{ backgroundColor: isPaid(user) ? 'unset' : 'red' }"
-        >
-          <td>{{ user.name }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.level }}</td>
-          <td>{{ getNextDate(user).toPlainDate() }}</td>
-          <td>
-            <button type="button" v-for="{ name } in user.profiles" :key="name">
-              {{ name }}
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div v-else class="text-center">Nothing here</div>
-  </BaseLayout>
-  <PaginationBar
-    :page="page"
-    @toPrevious="page = pagination?.previousPage!"
-    @toNext="page = pagination?.nextPage!"
-  />
+  <Card>
+    <CardHeader class="flex-row items-center">
+      <CardTitle>Users</CardTitle>
+      <Button as-child size="sm" class="ml-auto">
+        <RouterLink to="/user">Add</RouterLink>
+      </Button>
+    </CardHeader>
+    <CardContent>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead class="font-semibold">Name</TableHead>
+            <TableHead class="font-semibold">Email</TableHead>
+            <TableHead class="font-semibold">Level</TableHead>
+            <TableHead class="font-semibold">Status</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody v-if="pagination === undefined">
+          <TableRow v-for="i in 5" :key="i">
+            <TableCell>
+              <Skeleton class="h-3.5" />
+            </TableCell>
+            <TableCell>
+              <Skeleton class="h-3.5" />
+            </TableCell>
+            <TableCell>
+              <Skeleton class="h-3.5" />
+            </TableCell>
+            <TableCell>
+              <Skeleton class="h-3.5" />
+            </TableCell>
+          </TableRow>
+        </TableBody>
+        <TableBody v-else>
+          <TableRow v-if="pagination.items.length === 0">
+            <TableCell colspan="4" class="text-center text-muted-foreground">
+              Nothing here
+            </TableCell>
+          </TableRow>
+          <TableRow
+            v-else
+            v-for="user in pagination.items"
+            :key="user.id"
+            @click="$router.push(`/user/${user.id}`)"
+          >
+            <TableCell>{{ user.name }}</TableCell>
+            <TableCell>{{ user.email }}</TableCell>
+            <TableCell>{{ user.level }}</TableCell>
+            <TableCell class="font-semibold">
+              <div v-if="isPaid(user)">{{ user.profiles.length }} profiles</div>
+              <div v-else class="text-destructive">expired</div>
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </CardContent>
+    <CardFooter
+      v-if="pagination !== undefined && pagination.items.length !== 0"
+    >
+      <PaginationBar :total="pagination.total" v-model="page" />
+    </CardFooter>
+  </Card>
 </template>
