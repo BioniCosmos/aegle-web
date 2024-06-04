@@ -112,7 +112,7 @@ const deleteProfile = () =>
                 </div>
                 <CollapsibleContent class="space-y-2 mx-6">
                   <button
-                    class="rounded-md border px-4 py-3 font-mono text-sm w-full hover:bg-accent hover:text-accent-foreground"
+                    class="rounded-md border px-4 py-3 text-sm w-full hover:bg-accent hover:text-accent-foreground"
                     v-for="profileName in node.profileNames"
                     :key="profileName"
                     @click="openDialog(profileName)"

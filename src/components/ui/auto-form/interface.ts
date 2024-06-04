@@ -1,4 +1,8 @@
-import type { Component, InputHTMLAttributes } from 'vue'
+import type {
+  Component,
+  InputHTMLAttributes,
+  TextareaHTMLAttributes,
+} from 'vue'
 import type { ZodAny, z } from 'zod'
 import type { INPUT_COMPONENTS } from './constant'
 
@@ -27,7 +31,7 @@ export interface ConfigItem {
   component?: keyof typeof INPUT_COMPONENTS | Component
   /** Hide `FormLabel`. */
   hideLabel?: boolean
-  inputProps?: InputHTMLAttributes
+  inputProps?: InputHTMLAttributes | TextareaHTMLAttributes
 }
 
 // Define a type to unwrap an array

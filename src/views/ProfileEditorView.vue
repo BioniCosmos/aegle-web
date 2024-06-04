@@ -1,41 +1,45 @@
 <script setup lang="ts">
-import BaseLayout from '@/components/BaseLayout.vue'
+import { AutoForm } from '@/components/ui/auto-form'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import ky from 'ky'
+import type { GenericObject } from 'vee-validate'
 import { useRoute, useRouter } from 'vue-router'
+import { z } from 'zod'
 
 const route = useRoute()
 const router = useRouter()
 
-function insert(event: Event) {
-  const formData = new FormData(event.target as HTMLFormElement)
-  ky.post('/api/profile', {
-    json: {
-      ...Object.fromEntries(formData.entries()),
-      nodeId: route.query.nodeId,
-    },
-  }).then(() => router.push('/nodes'))
-}
+const schema = z.object({
+  name: z.string().min(1),
+  inbound: z.string().min(1),
+  outbound: z.string().min(1),
+})
+
+const insert = (event: GenericObject) =>
+  ky
+    .post('/api/profile', { json: { ...event, nodeId: route.query.nodeId } })
+    .then(() => router.push('/nodes'))
 </script>
 
 <template>
-  <BaseLayout>
-    <template #title>
-      <h3 class="mb-0">Adding a profile</h3>
-    </template>
-    <form @submit.prevent="insert">
-      <label for="name">
-        Name
-        <input id="name" name="name" required />
-      </label>
-      <label for="inbound">
-        Inbound configuration
-        <textarea id="inbound" name="inbound" rows="10" required></textarea>
-      </label>
-      <label for="outbound">
-        Outbound configuration
-        <textarea id="outbound" name="outbound" rows="10" required></textarea>
-      </label>
-      <button>Submit</button>
-    </form>
-  </BaseLayout>
+  <Card>
+    <CardHeader>
+      <CardTitle>Profile</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <AutoForm
+        class="space-y-6"
+        :schema="schema"
+        :field-config="{
+          inbound: { component: 'textarea', inputProps: { rows: 10 } },
+          outbound: { component: 'textarea', inputProps: { rows: 10 } },
+        }"
+        @submit="insert"
+        v-slot="{ submitting }"
+      >
+        <Button :disabled="submitting">Submit</Button>
+      </AutoForm>
+    </CardContent>
+  </Card>
 </template>

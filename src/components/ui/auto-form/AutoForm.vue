@@ -76,9 +76,10 @@ const submitting = ref(false)
 
 const formComponent = computed(() => (props.form ? 'form' : Form))
 const formComponentProps = computed(() => {
-  const submit = (val: GenericObject) => {
+  const submit = async (val: GenericObject) => {
     submitting.value = true
-    props.onSubmit?.(val).then(() => (submitting.value = false))
+    await props.onSubmit?.(val)
+    submitting.value = false
   }
   if (props.form) {
     return {
