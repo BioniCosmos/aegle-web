@@ -1,18 +1,16 @@
-export class User {
-  id = ''
-  name = ''
-  email = ''
-  level = 0
-  startDate = Temporal.Now.zonedDateTimeISO()
-  cycles = 1
-  uuid = ''
-  flow = ''
-  security = ''
-  profiles: { name: string }[] = []
+export interface User {
+  id: string
+  name: string
+  email: string
+  level: number
+  startDate: Temporal.ZonedDateTime
+  cycles: number
+  nextDate: Temporal.ZonedDateTime
+  uuid: string
+  flow: string
+  security: string
+  profiles: { name: string }[]
 }
-
-export const getNextDate = (user: User) =>
-  user.startDate.add({ months: user.cycles })
 
 export const parseUser = (text: string) =>
   JSON.parse(text, (key, value) =>

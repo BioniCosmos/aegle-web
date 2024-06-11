@@ -23,15 +23,13 @@ import ky from 'ky'
 import useSWRV from 'swrv'
 import { ref } from 'vue'
 
-type FullUser = User & { nextDate: Temporal.ZonedDateTime }
-
 const page = ref(1)
-const { data: pagination } = useSWRV<Pagination<FullUser>>(
+const { data: pagination } = useSWRV<Pagination<User>>(
   () => `/api/users?page=${page.value}`,
   (url) => ky(url, { parseJson: parseUser }).json(),
 )
 
-const isPaid = (user: FullUser) =>
+const isPaid = (user: User) =>
   Temporal.ZonedDateTime.compare(
     user.nextDate,
     Temporal.Now.zonedDateTimeISO(),

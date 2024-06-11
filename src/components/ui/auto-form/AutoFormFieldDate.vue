@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import { DateFormatter, getLocalTimeZone } from '@internationalized/date'
-import { CalendarIcon } from 'lucide-vue-next'
-import { beautifyObjectName } from './utils'
-import AutoFormLabel from './AutoFormLabel.vue'
-import type { FieldProps } from './interface'
+import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
 import {
   FormControl,
   FormDescription,
@@ -11,21 +8,30 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
-
-import { Calendar } from '@/components/ui/calendar'
-import { Button } from '@/components/ui/button'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { cn } from '@/utils'
+import {
+  DateFormatter,
+  getLocalTimeZone,
+  type CalendarDate,
+} from '@internationalized/date'
+import { CalendarIcon } from 'lucide-vue-next'
+import AutoFormLabel from './AutoFormLabel.vue'
+import type { FieldProps } from './interface'
+import { beautifyObjectName } from './utils'
 
 defineProps<FieldProps>()
 
 const df = new DateFormatter('en-US', {
   dateStyle: 'long',
 })
+
+const toDate = (date: Date | CalendarDate) =>
+  date instanceof Date ? date : date.toDate(getLocalTimeZone())
 </script>
 
 <template>
@@ -52,11 +58,7 @@ const df = new DateFormatter('en-US', {
                   <CalendarIcon class="mr-2 h-4 w-4" :size="16" />
                   {{
                     slotProps.componentField.modelValue
-                      ? df.format(
-                          slotProps.componentField.modelValue.toDate(
-                            getLocalTimeZone(),
-                          ),
-                        )
+                      ? df.format(toDate(slotProps.componentField.modelValue))
                       : 'Pick a date'
                   }}
                 </Button>
