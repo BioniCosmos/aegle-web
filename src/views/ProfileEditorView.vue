@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ConfigField from '@/components/ConfigField.vue'
 import { AutoForm } from '@/components/ui/auto-form'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -32,8 +33,8 @@ const insert = (event: GenericObject) =>
         class="space-y-6"
         :schema="schema"
         :field-config="{
-          inbound: { component: 'textarea', inputProps: { rows: 10 } },
-          outbound: { component: 'textarea', inputProps: { rows: 10 } },
+          inbound: { component: ConfigField },
+          outbound: { component: ConfigField },
         }"
         @submit="insert"
         v-slot="{ submitting }"

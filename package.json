@@ -13,11 +13,13 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@codemirror/lang-json": "^6.0.1",
     "@internationalized/date": "^3.5.4",
     "@vee-validate/zod": "^4.12.8",
     "@vueuse/core": "^10.10.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "codemirror": "^6.0.1",
     "ky": "^1.2.4",
     "lucide-vue-next": "^0.379.0",
     "pinia": "^2.1.7",
@@ -29,6 +31,7 @@
     "vaul-vue": "^0.1.2",
     "vee-validate": "^4.12.8",
     "vue": "^3.4.27",
+    "vue-codemirror": "^6.1.1",
     "vue-router": "^4.3.0",
     "zod": "^3.23.8"
   },
