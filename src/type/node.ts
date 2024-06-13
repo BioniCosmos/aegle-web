@@ -1,6 +1,6 @@
-export class Node {
-  id = ''
-  name = ''
-  apiAddress = ''
-  profileNames: string[] = []
+export interface Node {
+  id: string
+  name: string
+  apiAddress: string
+  profileNames: string[]
 }
