@@ -3,9 +3,21 @@ import WarningDialog from '@/components/WarningDialog.vue'
 import { AutoForm } from '@/components/ui/auto-form'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer'
 import type { Node } from '@/type/node'
 import { toTypedSchema } from '@vee-validate/zod'
+import { useMediaQuery } from '@vueuse/core'
 import ky from 'ky'
+import { Menu } from 'lucide-vue-next'
+import { VisuallyHidden } from 'radix-vue'
 import { useForm } from 'vee-validate'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -14,6 +26,22 @@ import { z } from 'zod'
 const router = useRouter()
 const id = useRoute().params.id as string
 const isUpdate = computed(() => id !== '')
+
+const isDesktop = useMediaQuery('(min-width: 768px)')
+function toProfileEditor() {
+  closeDrawer()
+  router.push(`/profile?nodeId=${id}`)
+}
+
+const drawerOpen = ref(false)
+const closeDrawer = () => (drawerOpen.value = false)
+
+const dialogOpen = ref(false)
+function openDialog() {
+  closeDrawer()
+  dialogOpen.value = true
+}
+const closeDialog = () => (dialogOpen.value = false)
 
 const schema = z.object({
   name: z.string().min(1),
@@ -30,11 +58,10 @@ const submit = () =>
     () => router.push('/nodes'),
   )
 
-const open = ref(false)
 const deleteNode = () =>
   ky
     .delete(`/api/node/${id}`)
-    .then(() => (open.value = false))
+    .then(closeDialog)
     .then(() => router.push('/nodes'))
 </script>
 
@@ -42,14 +69,35 @@ const deleteNode = () =>
   <Card>
     <CardHeader class="flex flex-row items-center justify-between">
       <CardTitle>Node</CardTitle>
-      <div v-if="isUpdate" class="space-x-4">
-        <Button size="sm" as-child variant="default">
-          <RouterLink :to="`/profile?nodeId=${id}`">Add a profile</RouterLink>
-        </Button>
-        <Button size="sm" variant="secondary" @click="open = true">
-          Remove the node
-        </Button>
-      </div>
+      <template v-if="isUpdate">
+        <div v-if="isDesktop" class="space-x-4">
+          <Button size="sm" @click="toProfileEditor">Add a profile</Button>
+          <Button size="sm" variant="secondary" @click="openDialog">
+            Remove the node
+          </Button>
+        </div>
+        <Drawer v-else v-model:open="drawerOpen">
+          <DrawerTrigger as-child>
+            <Button variant="outline" size="icon" class="shrink-0">
+              <Menu class="h-5 w-5" />
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <VisuallyHidden>
+              <DrawerHeader>
+                <DrawerTitle></DrawerTitle>
+                <DrawerDescription></DrawerDescription>
+              </DrawerHeader>
+            </VisuallyHidden>
+            <DrawerFooter>
+              <Button @click="toProfileEditor">Add a profile</Button>
+              <Button variant="secondary" @click="openDialog">
+                Remove the node
+              </Button>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      </template>
     </CardHeader>
     <CardContent>
       <AutoForm
@@ -66,7 +114,7 @@ const deleteNode = () =>
   </Card>
   <WarningDialog
     v-if="form.values.name !== undefined"
-    v-model="open"
+    v-model="dialogOpen"
     :name="form.values.name"
     @confirm="deleteNode"
   />

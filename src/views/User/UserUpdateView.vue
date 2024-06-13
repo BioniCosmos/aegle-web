@@ -3,12 +3,24 @@ import WarningDialog from '@/components/WarningDialog.vue'
 import { AutoForm, type ConfigItem } from '@/components/ui/auto-form'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import type { Profile } from '@/type/profile'
 import { parseUser, type User } from '@/type/user'
 import { toTypedSchema } from '@vee-validate/zod'
+import { useMediaQuery } from '@vueuse/core'
 import ky from 'ky'
+import { Menu } from 'lucide-vue-next'
+import { VisuallyHidden } from 'radix-vue'
 import useSWRV from 'swrv'
 import { useForm } from 'vee-validate'
 import { computed, onMounted, ref, watch } from 'vue'
@@ -17,6 +29,21 @@ import { customizeLabel, schema, type Key } from './common'
 
 const router = useRouter()
 const id = useRoute().params.id as string
+
+const isDesktop = useMediaQuery('(min-width: 768px)')
+
+const drawerOpen = ref(false)
+const closeDrawer = () => (drawerOpen.value = false)
+
+const dialogOpen = ref(false)
+function openDialog() {
+  closeDrawer()
+  dialogOpen.value = true
+}
+
+function viewSubscriptionLinks() {
+  open(`/api/user/profiles?id=${id}`)
+}
 
 const fieldConfig = computed(() => {
   const addProps = ([key, value]: [Key, ConfigItem]) => [
@@ -51,12 +78,10 @@ watch(user, (user) => {
   }
 })
 
-const open = ref(false)
-
 const deleteUser = () =>
   ky
     .delete(`/api/user/${id}`)
-    .then(() => (open.value = false))
+    .then(() => (dialogOpen.value = false))
     .then(() => router.replace('/users'))
 
 const extending = ref(false)
@@ -101,17 +126,37 @@ const isChecked = (profileName: string) =>
   <Card>
     <CardHeader class="flex-row items-center justify-between">
       <CardTitle>User</CardTitle>
-      <div class="space-x-4">
-        <Button size="sm" as-child>
-          <a :href="`/api/user/profiles?id=${id}`" target="_blank">
-            Subscription link
-          </a>
+      <div v-if="isDesktop" class="space-x-4">
+        <Button size="sm" @click="viewSubscriptionLinks">
+          Subscription link
         </Button>
         <Button size="sm" @click="extend" :disabled="extending">Extend</Button>
-        <Button size="sm" variant="secondary" @click="open = true">
+        <Button size="sm" variant="secondary" @click="openDialog">
           Remove the user
         </Button>
       </div>
+      <Drawer v-else v-model:open="drawerOpen">
+        <DrawerTrigger as-child>
+          <Button variant="outline" size="icon" class="shrink-0">
+            <Menu class="h-5 w-5" />
+          </Button>
+        </DrawerTrigger>
+        <DrawerContent>
+          <VisuallyHidden>
+            <DrawerHeader>
+              <DrawerTitle></DrawerTitle>
+              <DrawerDescription></DrawerDescription>
+            </DrawerHeader>
+          </VisuallyHidden>
+          <DrawerFooter>
+            <Button @click="viewSubscriptionLinks">Subscription link</Button>
+            <Button @click="extend" :disabled="extending">Extend</Button>
+            <Button variant="secondary" @click="openDialog">
+              Remove the user
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </CardHeader>
     <CardContent>
       <AutoForm
@@ -144,7 +189,7 @@ const isChecked = (profileName: string) =>
   <WarningDialog
     v-if="user !== undefined"
     :name="user.name"
-    v-model="open"
+    v-model="dialogOpen"
     @confirm="deleteUser"
   />
 </template>
