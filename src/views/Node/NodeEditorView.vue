@@ -103,7 +103,10 @@ const deleteNode = () =>
       <AutoForm
         class="space-y-6"
         :schema="schema"
-        :field-config="{ apiAddress: { label: 'API Address' } }"
+        :field-config="{
+          name: { inputProps: { autocomplete: 'off' } },
+          apiAddress: { label: 'API Address' },
+        }"
         :form="form"
         @submit="submit"
         v-slot="{ submitting }"

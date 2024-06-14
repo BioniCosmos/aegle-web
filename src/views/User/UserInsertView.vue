@@ -9,12 +9,18 @@ import { useForm, type GenericObject } from 'vee-validate'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { z } from 'zod'
-import { customizeLabel, schema } from './common'
+import { customizeLabel, disableAutoComplete, init, schema } from './common'
 
 const router = useRouter()
 
 const fieldConfig = computed(() =>
-  Object.fromEntries(schema.keyof().options.map(customizeLabel)),
+  Object.fromEntries(
+    schema
+      .keyof()
+      .options.map(init)
+      .map(customizeLabel)
+      .map(disableAutoComplete),
+  ),
 )
 
 const form = useForm({ validationSchema: toTypedSchema(schema) })

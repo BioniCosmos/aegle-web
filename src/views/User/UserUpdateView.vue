@@ -25,7 +25,13 @@ import useSWRV from 'swrv'
 import { useForm } from 'vee-validate'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { customizeLabel, schema, type Key } from './common'
+import {
+  customizeLabel,
+  disableAutoComplete,
+  init,
+  schema,
+  type Key,
+} from './common'
 
 const router = useRouter()
 const id = useRoute().params.id as string
@@ -48,10 +54,15 @@ function viewSubscriptionLinks() {
 const fieldConfig = computed(() => {
   const addProps = ([key, value]: [Key, ConfigItem]) => [
     key,
-    { ...value, inputProps: { readonly: true } },
+    { ...value, inputProps: { ...value.inputProps, readonly: true } },
   ]
   return Object.fromEntries(
-    schema.keyof().options.map(customizeLabel).map(addProps),
+    schema
+      .keyof()
+      .options.map(init)
+      .map(customizeLabel)
+      .map(disableAutoComplete)
+      .map(addProps),
   )
 })
 
@@ -128,7 +139,7 @@ const isChecked = (profileName: string) =>
       <CardTitle>User</CardTitle>
       <div v-if="isDesktop" class="space-x-4">
         <Button size="sm" @click="viewSubscriptionLinks">
-          Subscription link
+          Subscription links
         </Button>
         <Button size="sm" @click="extend" :disabled="extending">Extend</Button>
         <Button size="sm" variant="secondary" @click="openDialog">

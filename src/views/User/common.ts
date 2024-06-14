@@ -12,12 +12,26 @@ export const schema = z.object({
 })
 
 export type Key = keyof z.infer<typeof schema>
+export type FieldConfig = [Key, ConfigItem]
 
-export function customizeLabel(key: Key): [Key, ConfigItem] {
+export const init = (key: Key): [Key, ConfigItem] => [key, {}]
+
+export function customizeLabel([key, value]: FieldConfig): FieldConfig {
   const labelMap = {
     [key]: undefined,
     uuid: 'UUID',
     date: 'Next Billing Date',
   }
-  return [key, { label: labelMap[key] }]
+  return [key, { ...value, label: labelMap[key] }]
 }
+
+export const disableAutoComplete = ([key, value]: FieldConfig): FieldConfig =>
+  key === 'name' || key === 'email'
+    ? [
+        key,
+        {
+          ...value,
+          inputProps: { ...value.inputProps, autocomplete: 'off' },
+        },
+      ]
+    : [key, value]

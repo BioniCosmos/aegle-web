@@ -42,6 +42,7 @@ const toDate = (date: Date | CalendarDate) =>
       </AutoFormLabel>
       <FormControl>
         <slot v-bind="slotProps">
+          <input class="hidden" />
           <div>
             <Popover>
               <PopoverTrigger as-child :disabled="disabled">
