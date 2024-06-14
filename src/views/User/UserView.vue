@@ -45,7 +45,7 @@ const isPaid = (user: User) =>
       </Button>
     </CardHeader>
     <CardContent>
-      <Table>
+      <Table class="table-fixed">
         <TableHeader>
           <TableRow>
             <TableHead class="font-semibold">Name</TableHead>
@@ -57,16 +57,16 @@ const isPaid = (user: User) =>
         <TableBody v-if="pagination === undefined">
           <TableRow v-for="i in 5" :key="i">
             <TableCell>
-              <Skeleton class="h-3.5" />
+              <Skeleton class="h-6" />
             </TableCell>
             <TableCell>
-              <Skeleton class="h-3.5" />
+              <Skeleton class="h-6" />
             </TableCell>
             <TableCell>
-              <Skeleton class="h-3.5" />
+              <Skeleton class="h-6" />
             </TableCell>
             <TableCell>
-              <Skeleton class="h-3.5" />
+              <Skeleton class="h-6" />
             </TableCell>
           </TableRow>
         </TableBody>
@@ -82,10 +82,10 @@ const isPaid = (user: User) =>
             :key="user.id"
             @click="$router.push(`/user/${user.id}`)"
           >
-            <TableCell>{{ user.name }}</TableCell>
-            <TableCell>{{ user.email }}</TableCell>
-            <TableCell>{{ user.level }}</TableCell>
-            <TableCell class="font-semibold">
+            <TableCell class="truncate">{{ user.name }}</TableCell>
+            <TableCell class="truncate">{{ user.email }}</TableCell>
+            <TableCell class="truncate">{{ user.level }}</TableCell>
+            <TableCell class="font-semibold truncate">
               <div v-if="isPaid(user)">{{ user.profiles.length }} profiles</div>
               <div v-else class="text-destructive">expired</div>
             </TableCell>

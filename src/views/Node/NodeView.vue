@@ -59,24 +59,24 @@ const deleteProfile = () =>
       </Button>
     </CardHeader>
     <CardContent>
-      <Table>
+      <Table class="table-fixed max-md:w-[607px]">
         <TableHeader>
           <TableRow>
             <TableHead class="font-semibold">Name</TableHead>
             <TableHead class="font-semibold">API Address</TableHead>
-            <TableHead class="font-semibold">Profiles</TableHead>
+            <TableHead class="font-semibold w-[286px]">Profiles</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody v-if="pagination === undefined">
           <TableRow v-for="i in 5" :key="i">
             <TableCell>
-              <Skeleton class="h-3.5 w-[8ch]" />
+              <Skeleton class="h-6" />
             </TableCell>
             <TableCell>
-              <Skeleton class="h-3.5 w-full" />
+              <Skeleton class="h-6" />
             </TableCell>
             <TableCell>
-              <Skeleton class="h-3.5 w-[300px]" />
+              <Skeleton class="h-6" />
             </TableCell>
           </TableRow>
         </TableBody>
@@ -92,11 +92,11 @@ const deleteProfile = () =>
             :key="node.id"
             @click="$router.push(`/node/${node.id}`)"
           >
-            <TableCell>{{ node.name }}</TableCell>
-            <TableCell>{{ node.apiAddress }}</TableCell>
+            <TableCell class="truncate">{{ node.name }}</TableCell>
+            <TableCell class="truncate">{{ node.apiAddress }}</TableCell>
             <TableCell @click.stop>
-              <Collapsible class="w-[300px] space-y-2">
-                <div class="flex items-center justify-between space-x-4 px-4">
+              <Collapsible class="w-[250px] space-y-2">
+                <div class="flex items-center justify-between space-x-4">
                   <h4 class="text-sm font-semibold">
                     {{ node.profileNames.length }} profiles
                   </h4>
@@ -110,7 +110,7 @@ const deleteProfile = () =>
                     </Button>
                   </CollapsibleTrigger>
                 </div>
-                <CollapsibleContent class="space-y-2 mx-6">
+                <CollapsibleContent class="space-y-2 mx-2">
                   <button
                     class="rounded-md border px-4 py-3 text-sm w-full hover:bg-accent hover:text-accent-foreground"
                     v-for="profileName in node.profileNames"
