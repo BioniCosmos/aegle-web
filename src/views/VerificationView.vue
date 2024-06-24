@@ -6,11 +6,11 @@ import { useAccount, type Account } from '@/type/account'
 import ky, { HTTPError } from 'ky'
 import { CircleAlert } from 'lucide-vue-next'
 import { computed, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 
-const route = useRoute()
-const id = route.params.id as string
-const hasId = computed(() => id !== '')
+const props = defineProps<{ id: string }>()
+const id = computed(() => props.id)
+const hasId = computed(() => id.value !== '')
 const router = useRouter()
 
 const showAlert = ref(false)
@@ -22,7 +22,7 @@ const sendVerificationLink = () =>
 onMounted(() => {
   if (hasId.value) {
     const account = useAccount()
-    ky.post(`/api/account/verification/${id}`)
+    ky.post(`/api/account/verification/${id.value}`)
       .json<Account>()
       .then((body) => {
         account.value = body

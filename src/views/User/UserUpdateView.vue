@@ -25,7 +25,7 @@ import { VisuallyHidden } from 'radix-vue'
 import useSWRV from 'swrv'
 import { useForm } from 'vee-validate'
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import {
   customizeLabel,
   disableAutoComplete,
@@ -35,7 +35,8 @@ import {
 } from './common'
 
 const router = useRouter()
-const id = useRoute().params.id as string
+const props = defineProps<{ id: string }>()
+const id = computed(() => props.id)
 
 const isDesktop = useMediaQuery('(min-width: 768px)')
 
@@ -49,7 +50,7 @@ function openDialog() {
 }
 
 function viewSubscriptionLinks() {
-  open(`/api/user/profiles?id=${id}`)
+  open(`/api/user/profiles?id=${id.value}`)
 }
 
 const fieldConfig = computed(() => {
@@ -76,7 +77,7 @@ onMounted(() => {
     .then((value) => (profiles.value = value))
 })
 
-const { data: user, mutate } = useSWRV<User>(`/api/user/${id}`, (url) =>
+const { data: user, mutate } = useSWRV<User>(`/api/user/${id.value}`, (url) =>
   ky(url, { parseJson }).json(),
 )
 watch(user, (user) => {
@@ -92,7 +93,7 @@ watch(user, (user) => {
 
 const deleteUser = () =>
   ky
-    .delete(`/api/user/${id}`)
+    .delete(`/api/user/${id.value}`)
     .then(() => (dialogOpen.value = false))
     .then(() => router.replace('/users'))
 

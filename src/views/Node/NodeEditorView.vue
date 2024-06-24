@@ -20,17 +20,18 @@ import { Menu } from 'lucide-vue-next'
 import { VisuallyHidden } from 'radix-vue'
 import { useForm } from 'vee-validate'
 import { computed, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { z } from 'zod'
 
 const router = useRouter()
-const id = useRoute().params.id as string
-const isUpdate = computed(() => id !== '')
+const props = defineProps<{ id: string }>()
+const id = computed(() => props.id)
+const isUpdate = computed(() => id.value !== '')
 
 const isDesktop = useMediaQuery('(min-width: 768px)')
 function toProfileEditor() {
   closeDrawer()
-  router.push(`/profile?nodeId=${id}`)
+  router.push(`/profile?nodeId=${id.value}`)
 }
 
 const drawerOpen = ref(false)
@@ -50,7 +51,7 @@ const schema = z.object({
 const form = useForm({ validationSchema: toTypedSchema(schema) })
 onMounted(() => {
   if (isUpdate.value) {
-    ky(`/api/node/${id}`).json<Node>().then(form.setValues)
+    ky(`/api/node/${id.value}`).json<Node>().then(form.setValues)
   }
 })
 const submit = () =>
@@ -60,7 +61,7 @@ const submit = () =>
 
 const deleteNode = () =>
   ky
-    .delete(`/api/node/${id}`)
+    .delete(`/api/node/${id.value}`)
     .then(closeDialog)
     .then(() => router.push('/nodes'))
 </script>

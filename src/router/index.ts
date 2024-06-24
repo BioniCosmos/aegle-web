@@ -11,6 +11,7 @@ const router = createRouter({
     {
       path: '/verification/:id?',
       component: () => import('@/views/VerificationView.vue'),
+      props: true,
     },
     {
       path: '/sign-in',
@@ -34,6 +35,7 @@ const router = createRouter({
         {
           path: 'node/:id?',
           component: () => import('@/views/Node/NodeEditorView.vue'),
+          props: true,
         },
         {
           path: 'profile',
@@ -55,6 +57,7 @@ const router = createRouter({
         {
           path: 'user/:id',
           component: () => import('@/views/User/UserUpdateView.vue'),
+          props: true,
         },
       ],
     },
