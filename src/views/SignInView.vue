@@ -36,11 +36,13 @@ const schema = z.object({
 const errorMessage = ref('')
 
 const submit = (event: GenericObject) => {
-  const [, setAccount] = useAccount()
+  const account = useAccount()
   return ky
     .post('/api/account/sign-in', { json: event })
     .json<Account>()
-    .then(setAccount)
+    .then((body) => {
+      account.value = body
+    })
     .then(() => router.push('/'))
     .catch(async (error: HTTPError) => {
       if (error.response.status === 400 || error.response.status === 404) {

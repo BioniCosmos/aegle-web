@@ -6,13 +6,22 @@ export interface Account {
   name: string
   role: 'member' | 'admin'
   status: 'normal' | 'unverified'
+  expire: Temporal.Instant
 }
 
-export function useAccount(): [Account | null, (value: Account) => void] {
+export function useAccount() {
   const store = useStorage('account', '')
-  const get = computed(() =>
-    store.value !== '' ? JSON.parse(store.value) : null,
-  )
-  const set = (value: Account) => (store.value = JSON.stringify(value))
-  return [get.value, set]
+  const account = computed<Account | null>({
+    get: () => (store.value !== '' ? JSON.parse(store.value) : null),
+    set(value) {
+      store.value = value !== null ? JSON.stringify(value) : null
+    },
+  })
+  if (
+    account.value !== null &&
+    Temporal.Instant.compare(account.value.expire, Temporal.Now.instant()) !== 1
+  ) {
+    account.value = null
+  }
+  return account
 }

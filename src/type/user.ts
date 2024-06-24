@@ -11,8 +11,3 @@ export interface User {
   security: string
   profiles: { name: string }[]
 }
-
-export const parseUser = (text: string) =>
-  JSON.parse(text, (key, value) =>
-    key.endsWith('Date') ? Temporal.ZonedDateTime.from(value) : value,
-  )

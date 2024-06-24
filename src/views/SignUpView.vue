@@ -8,7 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { useAccount, type Account } from '@/type/account'
 import type { DefaultResponse } from '@/type/default-response'
+import { parseJson } from '@/utils'
 import { toTypedSchema } from '@vee-validate/zod'
 import ky, { HTTPError } from 'ky'
 import { useForm, type GenericObject } from 'vee-validate'
@@ -25,9 +27,14 @@ const schema = z.object({
 
 const form = useForm({ validationSchema: toTypedSchema(schema) })
 
-const submit = (event: GenericObject) =>
-  ky
-    .post('/api/account/sign-up', { json: event })
+const submit = (event: GenericObject) => {
+  const account = useAccount()
+  return ky
+    .post('/api/account/sign-up', { json: event, parseJson })
+    .json<Account>()
+    .then((body) => {
+      account.value = body
+    })
     .then(() => router.push('/verification'))
     .catch(async (error: HTTPError) => {
       if (error.response.status === 409) {
@@ -35,6 +42,7 @@ const submit = (event: GenericObject) =>
         form.setFieldError('email', body.message)
       }
     })
+}
 </script>
 
 <template>

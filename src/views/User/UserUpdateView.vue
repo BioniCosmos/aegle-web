@@ -15,7 +15,8 @@ import {
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import type { Profile } from '@/type/profile'
-import { parseUser, type User } from '@/type/user'
+import type { User } from '@/type/user'
+import { parseJson } from '@/utils'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useMediaQuery } from '@vueuse/core'
 import ky from 'ky'
@@ -76,7 +77,7 @@ onMounted(() => {
 })
 
 const { data: user, mutate } = useSWRV<User>(`/api/user/${id}`, (url) =>
-  ky(url, { parseJson: parseUser }).json(),
+  ky(url, { parseJson }).json(),
 )
 watch(user, (user) => {
   if (user !== undefined) {

@@ -1,3 +1,4 @@
+import { useAccount } from '@/type/account'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -18,6 +19,9 @@ const router = createRouter({
     {
       path: '/',
       component: () => import('@/views/BaseView.vue'),
+      meta: {
+        auth: true,
+      },
       children: [
         {
           path: '',
@@ -59,19 +63,24 @@ const router = createRouter({
 
 export default router
 
-// router.beforeEach(async (to) => {
-//   const accountStore = useAccountStore()
-//   const { isAuthorized } = storeToRefs(accountStore)
-//   if (!isAuthorized.value) {
-//     await accountStore.authorize()
-//   }
-//   if (to.path === '/sign-in') {
-//     if (isAuthorized.value) {
-//       return '/'
-//     }
-//   } else {
-//     if (!isAuthorized.value) {
-//       return '/sign-in'
-//     }
-//   }
-// })
+router.beforeEach((to) => {
+  const account = useAccount()
+  if (!['/sign-in', '/sign-up'].includes(to.path) && account.value === null) {
+    return '/sign-in'
+  }
+  if (
+    !to.path.startsWith('/verification') &&
+    account.value?.status === 'unverified'
+  ) {
+    return '/verification'
+  }
+  if (!to.meta.auth && account.value?.status === 'normal') {
+    return '/'
+  }
+})
+
+declare module 'vue-router' {
+  interface RouteMeta {
+    auth?: boolean
+  }
+}

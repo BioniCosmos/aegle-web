@@ -18,7 +18,8 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import type { Pagination } from '@/type/pagination'
-import { parseUser, type User } from '@/type/user'
+import type { User } from '@/type/user'
+import { parseJson } from '@/utils'
 import ky from 'ky'
 import useSWRV from 'swrv'
 import { ref } from 'vue'
@@ -26,7 +27,7 @@ import { ref } from 'vue'
 const page = ref(1)
 const { data: pagination } = useSWRV<Pagination<User>>(
   () => `/api/users?page=${page.value}`,
-  (url) => ky(url, { parseJson: parseUser }).json(),
+  (url) => ky(url, { parseJson }).json(),
 )
 
 const isPaid = (user: User) =>
