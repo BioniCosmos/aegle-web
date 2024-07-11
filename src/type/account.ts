@@ -25,3 +25,8 @@ export function useAccount() {
   }
   return account
 }
+
+export interface TOTP {
+  secret: string
+  image: string
+}

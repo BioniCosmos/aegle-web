@@ -65,7 +65,18 @@ const router = createRouter({
           children: [
             {
               path: 'account',
-              component: () => import('@/views/setting/AccountView.vue'),
+              children: [
+                {
+                  path: '',
+                  component: () =>
+                    import('@/views/setting/account/RootView.vue'),
+                },
+                {
+                  path: 'totp',
+                  component: () =>
+                    import('@/views/setting/account/TOTPView.vue'),
+                },
+              ],
             },
             {
               path: 'server',

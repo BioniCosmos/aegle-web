@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { RouterLink } from 'vue-router'
 </script>
 
 <template>
@@ -55,5 +56,22 @@ import { Input } from '@/components/ui/input'
     <CardFooter class="border-t px-6 py-4">
       <Button>Save</Button>
     </CardFooter>
+  </Card>
+  <Card>
+    <CardHeader>
+      <CardTitle>Multi-factor Authentication</CardTitle>
+      <CardDescription>
+        Multi-factor authentication adds an additional layer of security to your
+        account by requiring more than just a password to sign in.
+      </CardDescription>
+    </CardHeader>
+    <CardContent>
+      <div class="flex justify-between items-center">
+        <div class="scroll-m-20 text-xl font-semibold tracking-tight">TOTP</div>
+        <Button as-child>
+          <RouterLink to="/setting/account/totp">Enable</RouterLink>
+        </Button>
+      </div>
+    </CardContent>
   </Card>
 </template>
