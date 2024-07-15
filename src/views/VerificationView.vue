@@ -3,7 +3,6 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import ky from '@/ky'
-import { useAccount, type Account } from '@/type/account'
 import type { HTTPError } from 'ky'
 import { CircleAlert } from 'lucide-vue-next'
 import { computed, onMounted, ref } from 'vue'
@@ -22,12 +21,7 @@ const sendVerificationLink = () =>
 
 onMounted(() => {
   if (hasId.value) {
-    const account = useAccount()
     ky.post(`api/account/verification/${id.value}`)
-      .json<Account>()
-      .then((body) => {
-        account.value = body
-      })
       .then(() => router.push('/'))
       .catch((error: HTTPError) => {
         if (error.response.status === 404) {

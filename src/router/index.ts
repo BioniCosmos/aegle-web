@@ -1,4 +1,5 @@
-import { useAccount } from '@/type/account'
+import ky from '@/ky'
+import { account, type Account } from '@/type/account'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -95,20 +96,47 @@ const router = createRouter({
 
 export default router
 
-router.beforeEach((to) => {
-  const account = useAccount()
-  if (!['/sign-in', '/sign-up'].includes(to.path) && account.value === null) {
-    return '/sign-in'
+router.beforeEach(async (to) => {
+  account.value = await ky('api/account').json<Account | null>()
+
+  function getRouteType() {
+    if (to.meta.auth) return 'auth'
+    if (to.path === '/mfa') return 'mfa'
+    if (to.path.startsWith('/verification')) return 'verification'
+    if (['/sign-in', '/sign-up'].includes(to.path)) return 'public'
+    throw Error('Unknown route type')
   }
-  if (
-    !to.path.startsWith('/verification') &&
-    account.value?.status === 'unverified'
-  ) {
-    return '/verification'
-  }
-  if (!to.meta.auth && account.value?.status === 'normal') {
-    return '/'
-  }
+
+  const routeType = getRouteType()
+  const status = account.value?.status ?? 'none'
+
+  const routeMap = {
+    auth: {
+      none: '/sign-in',
+      unverified: '/verification',
+      needMFA: '/mfa',
+      signedIn: true,
+    },
+    mfa: {
+      none: '/sign-in',
+      unverified: '/verification',
+      needMFA: true,
+      signedIn: '/auth',
+    },
+    verification: {
+      none: '/sign-in',
+      unverified: true,
+      needMFA: '/mfa',
+      signedIn: '/auth',
+    },
+    public: {
+      none: true,
+      unverified: '/verification',
+      needMFA: '/mfa',
+      signedIn: '/auth',
+    },
+  } as const
+  return routeMap[routeType][status]
 })
 
 declare module 'vue-router' {

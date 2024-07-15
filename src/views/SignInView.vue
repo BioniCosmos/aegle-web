@@ -18,7 +18,6 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import ky from '@/ky'
-import { useAccount, type Account } from '@/type/account'
 import type { DefaultResponse } from '@/type/default-response'
 import type { HTTPError } from 'ky'
 import { AlertCircle } from 'lucide-vue-next'
@@ -36,14 +35,9 @@ const schema = z.object({
 
 const errorMessage = ref('')
 
-const submit = (event: GenericObject) => {
-  const account = useAccount()
-  return ky
+const submit = (event: GenericObject) =>
+  ky
     .post('api/account/sign-in', { json: event })
-    .json<Account>()
-    .then((body) => {
-      account.value = body
-    })
     .then(() => router.push('/'))
     .catch(async (error: HTTPError) => {
       if (error.response.status === 400 || error.response.status === 404) {
@@ -51,7 +45,6 @@ const submit = (event: GenericObject) => {
         errorMessage.value = body.message
       }
     })
-}
 </script>
 
 <template>
