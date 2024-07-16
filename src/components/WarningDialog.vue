@@ -45,7 +45,7 @@ const confirm = () => {
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel>Cancel</AlertDialogCancel>
+        <AlertDialogCancel :disabled="submitting">Cancel</AlertDialogCancel>
         <Button variant="destructive" :disabled="submitting" @click="confirm">
           Continue
         </Button>
@@ -65,7 +65,7 @@ const confirm = () => {
           Continue
         </Button>
         <DrawerClose as-child>
-          <Button variant="outline">Cancel</Button>
+          <Button variant="outline" :disabled="submitting">Cancel</Button>
         </DrawerClose>
       </DrawerFooter>
     </DrawerContent>
