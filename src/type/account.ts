@@ -1,3 +1,4 @@
+import ky from '@/ky'
 import { ref } from 'vue'
 
 export interface Account {
@@ -8,6 +9,10 @@ export interface Account {
 }
 
 export const account = ref<Account | null>(null)
+
+export async function refreshAccount() {
+  account.value = await ky('api/account').json<Account | null>()
+}
 
 export interface TOTP {
   secret: string

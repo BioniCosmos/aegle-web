@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import ky from '@/ky'
+import { refreshAccount } from '@/type/account'
 import type { DefaultResponse } from '@/type/default-response'
 import type { HTTPError } from 'ky'
 import { AlertCircle } from 'lucide-vue-next'
@@ -38,6 +39,7 @@ const errorMessage = ref('')
 const submit = (event: GenericObject) =>
   ky
     .post('api/account/sign-in', { json: event })
+    .then(refreshAccount)
     .then(() => router.push('/mfa'))
     .catch(async (error: HTTPError) => {
       if (error.response.status === 400 || error.response.status === 404) {

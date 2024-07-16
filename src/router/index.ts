@@ -1,5 +1,4 @@
-import ky from '@/ky'
-import { account, type Account } from '@/type/account'
+import { account, refreshAccount } from '@/type/account'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -98,7 +97,9 @@ const router = createRouter({
 export default router
 
 router.beforeEach(async (to) => {
-  account.value = await ky('api/account').json<Account | null>()
+  if (account.value === null) {
+    await refreshAccount()
+  }
 
   function getRouteType() {
     if (to.meta.auth) return 'auth'

@@ -13,6 +13,7 @@ import {
   PinInputInput,
 } from '@/components/ui/pin-input'
 import ky from '@/ky'
+import { refreshAccount } from '@/type/account'
 import type { DefaultResponse } from '@/type/default-response'
 import type { HTTPError } from 'ky'
 import { AlertCircle } from 'lucide-vue-next'
@@ -26,6 +27,7 @@ const code = ref<string[]>([])
 const submit = (event: string[]) =>
   ky
     .post('api/account/mfa', { json: { code: event.join('') } })
+    .then(refreshAccount)
     .then(() => router.push('/'))
     .catch(async (error: HTTPError) => {
       const body: DefaultResponse = await error.response.json()
