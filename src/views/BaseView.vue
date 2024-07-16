@@ -9,7 +9,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { CircleUser, Menu } from 'lucide-vue-next'
+import { useColorMode } from '@vueuse/core'
+import { CircleUser, Menu, Moon, Sun } from 'lucide-vue-next'
+
+const mode = useColorMode()
 </script>
 
 <template>
@@ -80,24 +83,44 @@ import { CircleUser, Menu } from 'lucide-vue-next'
           </nav>
         </SheetContent>
       </Sheet>
-      <DropdownMenu>
-        <DropdownMenuTrigger as-child>
-          <Button variant="secondary" size="icon" class="rounded-full ml-auto">
-            <CircleUser class="h-5 w-5" />
-            <span class="sr-only">Toggle user menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem as-child>
-            <RouterLink to="/setting/account">Settings</RouterLink>
-          </DropdownMenuItem>
-          <DropdownMenuItem>Support</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>Logout</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div class="ml-auto space-x-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger as-child>
+            <Button variant="secondary" size="icon" class="rounded-full">
+              <Sun
+                class="size-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+              />
+              <Moon
+                class="absolute size-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+              />
+              <span class="sr-only">Toggle theme</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem @click="mode = 'light'">Light</DropdownMenuItem>
+            <DropdownMenuItem @click="mode = 'dark'">Dark</DropdownMenuItem>
+            <DropdownMenuItem @click="mode = 'auto'">System</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger as-child>
+            <Button variant="secondary" size="icon" class="rounded-full">
+              <CircleUser class="h-5 w-5" />
+              <span class="sr-only">Toggle user menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem as-child>
+              <RouterLink to="/setting/account">Settings</RouterLink>
+            </DropdownMenuItem>
+            <DropdownMenuItem>Support</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Logout</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </header>
     <main
       class="p-4 md:p-10 bg-muted/40 min-h-[calc(100vh_-_theme(spacing.16))]"
