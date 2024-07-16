@@ -19,7 +19,7 @@ import { useMediaQuery } from '@vueuse/core'
 import { Menu } from 'lucide-vue-next'
 import { VisuallyHidden } from 'radix-vue'
 import { useForm } from 'vee-validate'
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { z } from 'zod'
 
@@ -49,21 +49,26 @@ const schema = z.object({
   apiAddress: z.string().min(1),
 })
 const form = useForm({ validationSchema: toTypedSchema(schema) })
-onMounted(() => {
+watchEffect(() => {
   if (isUpdate.value) {
     ky(`api/node/${id.value}`).json<Node>().then(form.setValues)
   }
 })
-const submit = () =>
-  ky[isUpdate.value ? 'put' : 'post']('api/node', { json: form.values }).then(
-    () => router.push('/nodes'),
-  )
+
+const insert = () =>
+  ky
+    .post('api/node', { json: form.values })
+    .json<{ id: string }>()
+    .then(({ id }) => router.push(`/node/${id}`))
+
+const update = () =>
+  ky.put('api/node', { json: form.values }).then(() => router.push('/nodes'))
 
 const deleteNode = () =>
   ky
     .delete(`api/node/${id.value}`)
     .then(closeDialog)
-    .then(() => router.push('/nodes'))
+    .then(() => router.replace('/nodes'))
 </script>
 
 <template>
@@ -109,7 +114,7 @@ const deleteNode = () =>
           apiAddress: { label: 'API Address' },
         }"
         :form="form"
-        @submit="submit"
+        :onSubmit="isUpdate ? update : insert"
         v-slot="{ submitting }"
       >
         <Button :disabled="submitting">Submit</Button>

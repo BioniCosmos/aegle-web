@@ -57,7 +57,8 @@ function submit(event: GenericObject) {
     .post('api/user', {
       json: { ...fields, startDate, cycles: 1, nextDate },
     })
-    .then(() => router.replace('/users'))
+    .json<{ id: string }>()
+    .then(({ id }) => router.push(`/user/${id}`))
 }
 
 function dateToZonedDateTime(date: Date) {
