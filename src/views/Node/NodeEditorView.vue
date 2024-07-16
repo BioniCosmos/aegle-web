@@ -119,7 +119,10 @@ const deleteNode = () =>
   <WarningDialog
     v-if="form.values.name !== undefined"
     v-model="dialogOpen"
-    :name="form.values.name"
     @confirm="deleteNode"
-  />
+  >
+    The
+    <span class="font-semibold text-primary">{{ form.values.name }}</span> will
+    be permanently deleted.
+  </WarningDialog>
 </template>

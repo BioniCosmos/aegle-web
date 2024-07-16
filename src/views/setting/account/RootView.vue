@@ -9,7 +9,22 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import WarningDialog from '@/components/WarningDialog.vue'
+import ky, { fetcher } from '@/ky'
+import type { MFA } from '@/type/account'
+import useSWRV from 'swrv'
+import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
+
+const { data: mfa, mutate } = useSWRV<MFA>('api/account/mfa', fetcher)
+const open = ref(false)
+const disableTOTP = () =>
+  ky
+    .delete('api/account/mfa/totp')
+    .then(() => mutate())
+    .then(() => {
+      open.value = false
+    })
 </script>
 
 <template>
@@ -66,12 +81,19 @@ import { RouterLink } from 'vue-router'
       </CardDescription>
     </CardHeader>
     <CardContent>
-      <div class="flex justify-between items-center">
+      <div
+        v-if="mfa?.totp !== undefined"
+        class="flex justify-between items-center"
+      >
         <div class="scroll-m-20 text-xl font-semibold tracking-tight">TOTP</div>
-        <Button as-child>
+        <Button v-if="!mfa.totp" as-child>
           <RouterLink to="/setting/account/totp">Enable</RouterLink>
         </Button>
+        <Button v-else @click="open = true">Disable</Button>
       </div>
     </CardContent>
   </Card>
+  <WarningDialog v-model="open" @confirm="disableTOTP">
+    It is not recommended to disable the authentication.
+  </WarningDialog>
 </template>

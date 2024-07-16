@@ -198,8 +198,11 @@ const isChecked = (profileName: string) =>
   </Card>
   <WarningDialog
     v-if="user !== undefined"
-    :name="user.name"
     v-model="dialogOpen"
     @confirm="deleteUser"
-  />
+  >
+    The
+    <span class="font-semibold text-primary">{{ user.name }}</span>
+    will be permanently deleted.
+  </WarningDialog>
 </template>

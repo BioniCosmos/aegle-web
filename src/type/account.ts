@@ -13,3 +13,7 @@ export interface TOTP {
   secret: string
   image: string
 }
+
+export interface MFA {
+  totp: boolean
+}

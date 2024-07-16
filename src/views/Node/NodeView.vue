@@ -132,5 +132,9 @@ const deleteProfile = () =>
       <PaginationBar :total="pagination.total" v-model="page" />
     </CardFooter>
   </Card>
-  <WarningDialog v-model="open" :name="profileName" @confirm="deleteProfile" />
+  <WarningDialog v-model="open" @confirm="deleteProfile">
+    The
+    <span class="font-semibold text-primary">{{ profileName }}</span>
+    will be permanently deleted.
+  </WarningDialog>
 </template>

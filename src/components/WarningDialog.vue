@@ -19,19 +19,14 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer'
 import { useMediaQuery } from '@vueuse/core'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 
-const props = defineProps<{ name: string; onConfirm: () => Promise<unknown> }>()
+const props = defineProps<{ onConfirm: () => Promise<unknown> }>()
 const open = defineModel<boolean>()
 
 const isDesktop = useMediaQuery('(min-width: 768px)')
 
 const title = 'Are you absolutely sure?'
-const description = computed(
-  () => `The
-<span class="font-semibold text-primary">${props.name}</span>
-will be permanently deleted.`,
-)
 
 const submitting = ref(false)
 const confirm = () => {
@@ -45,8 +40,8 @@ const confirm = () => {
     <AlertDialogContent>
       <AlertDialogHeader>
         <AlertDialogTitle>{{ title }}</AlertDialogTitle>
-        <AlertDialogDescription as-child>
-          <p v-html="description" />
+        <AlertDialogDescription>
+          <slot />
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
@@ -61,8 +56,8 @@ const confirm = () => {
     <DrawerContent>
       <DrawerHeader class="text-left">
         <DrawerTitle>{{ title }}</DrawerTitle>
-        <DrawerDescription as-child>
-          <p v-html="description" />
+        <DrawerDescription>
+          <slot />
         </DrawerDescription>
       </DrawerHeader>
       <DrawerFooter class="pt-2">
