@@ -38,7 +38,7 @@ const errorMessage = ref('')
 const submit = (event: GenericObject) =>
   ky
     .post('api/account/sign-in', { json: event })
-    .then(() => router.push('/'))
+    .then(() => router.push('/mfa'))
     .catch(async (error: HTTPError) => {
       if (error.response.status === 400 || error.response.status === 404) {
         const body: DefaultResponse = await error.response.json()

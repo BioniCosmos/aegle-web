@@ -18,6 +18,7 @@ const router = createRouter({
       path: '/sign-in',
       component: () => import('@/views/SignInView.vue'),
     },
+    { path: '/mfa', component: () => import('@/views/MFAView.vue') },
     {
       path: '/',
       component: () => import('@/views/BaseView.vue'),
@@ -121,19 +122,19 @@ router.beforeEach(async (to) => {
       none: '/sign-in',
       unverified: '/verification',
       needMFA: true,
-      signedIn: '/auth',
+      signedIn: '/',
     },
     verification: {
       none: '/sign-in',
       unverified: true,
       needMFA: '/mfa',
-      signedIn: '/auth',
+      signedIn: '/',
     },
     public: {
       none: true,
       unverified: '/verification',
       needMFA: '/mfa',
-      signedIn: '/auth',
+      signedIn: '/',
     },
   } as const
   return routeMap[routeType][status]
