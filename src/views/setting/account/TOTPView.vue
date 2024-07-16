@@ -13,6 +13,7 @@ import {
   PinInputGroup,
   PinInputInput,
 } from '@/components/ui/pin-input'
+import { Skeleton } from '@/components/ui/skeleton'
 import ky from '@/ky'
 import type { TOTP } from '@/type/account'
 import type { DefaultResponse } from '@/type/default-response'
@@ -67,17 +68,26 @@ function submit(event: Event) {
               Scan the following QR code in your authenticator app
             </p>
             <p class="leading-7 [&:not(:first-child)]:mt-6">
-              <img :src="totp?.image" width="200" height="200" />
+              <img
+                v-if="totp !== undefined"
+                :src="totp.image"
+                width="200"
+                height="200"
+              />
+              <Skeleton v-else class="size-[200px]" />
             </p>
             <p class="leading-7 [&:not(:first-child)]:mt-6">
               <span class="text-sm text-muted-foreground">
                 Unable to scan? Configure your authenticator app manually:
               </span>
+              <br />
               <code
+                v-if="totp !== undefined"
                 class="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
               >
-                {{ totp?.secret }}
+                {{ totp.secret }}
               </code>
+              <Skeleton v-else class="w-[314px] h-[25px]" />
             </p>
           </li>
           <li class="space-y-2">
