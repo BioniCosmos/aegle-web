@@ -54,6 +54,11 @@ const submit = (event: GenericObject) =>
           class="space-y-4"
           :schema="schema"
           :form="form"
+          :field-config="{
+            email: { inputProps: { autocomplete: 'email' } },
+            name: { inputProps: { autocomplete: 'username' } },
+            password: { inputProps: { autocomplete: 'new-password' } },
+          }"
           @submit="submit"
           v-slot="{ submitting }"
         >

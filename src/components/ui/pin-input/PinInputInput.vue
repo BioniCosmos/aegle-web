@@ -21,6 +21,7 @@ const forwardedProps = useForwardProps(delegatedProps)
 
 <template>
   <PinInputInput
+    :id="`otp-${index}`"
     v-bind="forwardedProps"
     :class="
       cn(

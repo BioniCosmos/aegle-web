@@ -33,6 +33,7 @@ const insert = (event: GenericObject) =>
         class="space-y-6"
         :schema="schema"
         :field-config="{
+          name: { inputProps: { autocomplete: 'off' } },
           inbound: { component: ConfigField },
           outbound: { component: ConfigField },
         }"

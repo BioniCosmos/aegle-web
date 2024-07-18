@@ -66,7 +66,15 @@ const submit = (event: GenericObject) =>
             {{ errorMessage }}
           </AlertDescription>
         </Alert>
-        <AutoForm class="space-y-4" :schema="schema" @submit="submit">
+        <AutoForm
+          class="space-y-4"
+          :schema="schema"
+          :field-config="{
+            email: { inputProps: { autocomplete: 'email' } },
+            password: { inputProps: { autocomplete: 'current-password' } },
+          }"
+          @submit="submit"
+        >
           <template #password="{ shape, fieldName }">
             <FormField v-slot="{ componentField }" :name="fieldName">
               <FormItem>
