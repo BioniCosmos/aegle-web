@@ -5,42 +5,29 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/sign-up',
-      component: () => import('@/views/SignUpView.vue'),
-    },
-    {
-      path: '/verification/:id?',
-      component: () => import('@/views/VerificationView.vue'),
-      props: true,
-    },
-    {
-      path: '/sign-in',
-      component: () => import('@/views/SignInView.vue'),
-    },
-    { path: '/mfa', component: () => import('@/views/MFAView.vue') },
-    {
       path: '/',
-      component: () => import('@/views/BaseView.vue'),
-      meta: {
-        auth: true,
-      },
+      component: () => import('@/views/RootLayout.vue'),
       children: [
         {
           path: '',
           component: () => import('@/views/HomeView.vue'),
+          meta: { auth: true },
         },
         {
           path: 'nodes',
           component: () => import('@/views/Node/NodeView.vue'),
+          meta: { auth: true },
         },
         {
           path: 'node/:id?',
           component: () => import('@/views/Node/NodeEditorView.vue'),
+          meta: { auth: true },
           props: true,
         },
         {
           path: 'profile',
           component: () => import('@/views/ProfileEditorView.vue'),
+          meta: { auth: true },
           beforeEnter: (to, from) => {
             if (!to.query.nodeId) {
               return from
@@ -50,19 +37,23 @@ const router = createRouter({
         {
           path: 'users',
           component: () => import('@/views/User/UserView.vue'),
+          meta: { auth: true },
         },
         {
           path: 'user',
           component: () => import('@/views/User/UserInsertView.vue'),
+          meta: { auth: true },
         },
         {
           path: 'user/:id',
           component: () => import('@/views/User/UserUpdateView.vue'),
+          meta: { auth: true },
           props: true,
         },
         {
           path: 'setting',
           component: () => import('@/views/SettingView.vue'),
+          meta: { auth: true },
           children: [
             {
               path: 'account',
@@ -88,6 +79,27 @@ const router = createRouter({
               component: () => import('@/views/setting/SMTPView.vue'),
             },
           ],
+        },
+        {
+          path: '/sign-up',
+          component: () => import('@/views/SignUpView.vue'),
+          meta: { auth: false },
+        },
+        {
+          path: '/verification/:id?',
+          component: () => import('@/views/VerificationView.vue'),
+          meta: { auth: false },
+          props: true,
+        },
+        {
+          path: '/sign-in',
+          component: () => import('@/views/SignInView.vue'),
+          meta: { auth: false },
+        },
+        {
+          path: '/mfa',
+          component: () => import('@/views/MFAView.vue'),
+          meta: { auth: false },
         },
       ],
     },
@@ -143,6 +155,6 @@ router.beforeEach(async (to) => {
 
 declare module 'vue-router' {
   interface RouteMeta {
-    auth?: boolean
+    auth: boolean
   }
 }

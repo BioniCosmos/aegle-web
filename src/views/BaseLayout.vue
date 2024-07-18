@@ -106,7 +106,7 @@ import { CircleUser, Menu } from 'lucide-vue-next'
     <main
       class="p-4 md:p-10 bg-muted/40 min-h-[calc(100vh_-_theme(spacing.16))]"
     >
-      <RouterView />
+      <slot />
     </main>
   </div>
 </template>
