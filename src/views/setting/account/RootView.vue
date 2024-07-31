@@ -80,7 +80,7 @@ const disableTOTP = () =>
         account by requiring more than just a password to sign in.
       </CardDescription>
     </CardHeader>
-    <CardContent>
+    <CardContent class="space-y-4">
       <div
         v-if="mfa?.totp !== undefined"
         class="flex justify-between items-center"
@@ -90,6 +90,14 @@ const disableTOTP = () =>
           <RouterLink to="/setting/account/totp">Enable</RouterLink>
         </Button>
         <Button v-else @click="open = true">Disable</Button>
+      </div>
+      <div v-if="mfa?.totp" class="flex justify-between items-center">
+        <div class="scroll-m-20 text-xl font-semibold tracking-tight">
+          Recovery codes
+        </div>
+        <Button as-child>
+          <RouterLink to="/setting/account/recovery-codes">View</RouterLink>
+        </Button>
       </div>
     </CardContent>
   </Card>

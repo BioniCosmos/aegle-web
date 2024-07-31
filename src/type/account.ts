@@ -22,3 +22,8 @@ export interface TOTP {
 export interface MFA {
   totp: boolean
 }
+
+export interface RecoveryCode {
+  code: string
+  used: boolean
+}

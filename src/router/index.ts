@@ -68,6 +68,11 @@ const router = createRouter({
                   component: () =>
                     import('@/views/setting/account/TOTPView.vue'),
                 },
+                {
+                  path: 'recovery-codes',
+                  component: () =>
+                    import('@/views/setting/account/RecoveryCodeView.vue'),
+                },
               ],
             },
             {
