@@ -105,6 +105,17 @@ const router = createRouter({
           path: '/mfa',
           component: () => import('@/views/MFAView.vue'),
           meta: { auth: false },
+          children: [
+            { path: '', component: () => import('@/views/mfa/RootView.vue') },
+            {
+              path: 'totp',
+              component: () => import('@/views/mfa/TOTPView.vue'),
+            },
+            {
+              path: 'recovery-codes',
+              component: () => import('@/views/mfa/RecoveryCodeView.vue'),
+            },
+          ],
         },
       ],
     },
@@ -120,7 +131,7 @@ router.beforeEach(async (to) => {
 
   function getRouteType() {
     if (to.meta.auth) return 'auth'
-    if (to.path === '/mfa') return 'mfa'
+    if (to.path.startsWith('/mfa')) return 'mfa'
     if (to.path.startsWith('/verification')) return 'verification'
     if (['/sign-in', '/sign-up'].includes(to.path)) return 'public'
     throw Error('Unknown route type')

@@ -56,7 +56,7 @@ const generate = () =>
       <div
         v-for="{ code, used } in codes"
         :key="code"
-        :class="['font-mono', { 'line-through': used }]"
+        :class="['font-mono', { 'line-through opacity-30': used }]"
       >
         {{ code }}
       </div>
