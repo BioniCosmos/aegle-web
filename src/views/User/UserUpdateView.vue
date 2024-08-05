@@ -35,7 +35,6 @@ import {
 
 const router = useRouter()
 const props = defineProps<{ id: string }>()
-const id = computed(() => props.id)
 
 const isDesktop = useMediaQuery('(min-width: 768px)')
 
@@ -49,7 +48,7 @@ function openDialog() {
 }
 
 function viewSubscriptionLinks() {
-  open(`/api/user/profiles?id=${id.value}`)
+  open(`/api/user/profiles?id=${props.id}`)
 }
 
 const fieldConfig = computed(() => {
@@ -76,7 +75,7 @@ onMounted(() => {
     .then((value) => (profiles.value = value))
 })
 
-const { data: user, mutate } = useSWRV<User>(`api/user/${id.value}`, fetcher)
+const { data: user, mutate } = useSWRV<User>(`api/user/${props.id}`, fetcher)
 watch(user, (user) => {
   if (user !== undefined) {
     form.resetForm({
@@ -90,7 +89,7 @@ watch(user, (user) => {
 
 const deleteUser = () =>
   ky
-    .delete(`api/user/${id.value}`)
+    .delete(`api/user/${props.id}`)
     .then(() => (dialogOpen.value = false))
     .then(() => router.replace('/users'))
 
@@ -104,7 +103,7 @@ function extend() {
   return ky
     .put('api/user', {
       json: {
-        id,
+        id: props.id,
         cycles: cycles + 1,
         nextDate: startDate.add({ months: cycles + 1 }),
       },
@@ -122,7 +121,11 @@ function update(name: string, checked: boolean) {
   updating.value = true
   return ky
     .patch('api/user', {
-      json: { id, profileName: name, action: checked ? 'add' : 'remove' },
+      json: {
+        id: props.id,
+        profileName: name,
+        action: checked ? 'add' : 'remove',
+      },
     })
     .then(() => mutate())
     .then(() => (updating.value = false))
