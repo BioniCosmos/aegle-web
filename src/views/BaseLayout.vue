@@ -10,7 +10,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import ky from '@/ky'
+import { account, refreshAccount } from '@/type/account'
 import { CircleUser, Menu } from 'lucide-vue-next'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const signOut = () =>
+  ky
+    .post('api/account/sign-out')
+    .then(refreshAccount)
+    .then(() => router.push('/sign-in'))
 </script>
 
 <template>
@@ -91,14 +101,18 @@ import { CircleUser, Menu } from 'lucide-vue-next'
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>
+              {{ account?.name }}
+              <br />
+              <div class="text-muted-foreground text-xs font-normal">
+                {{ account?.email }}
+              </div>
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem as-child>
               <RouterLink to="/setting/account">Settings</RouterLink>
             </DropdownMenuItem>
-            <DropdownMenuItem>Support</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Logout</DropdownMenuItem>
+            <DropdownMenuItem @click="signOut">Sign out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
