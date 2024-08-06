@@ -3,10 +3,9 @@ import { AutoForm } from '@/components/ui/auto-form'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import ky from '@/ky'
-import type { Profile } from '@/type/profile'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm, type GenericObject } from 'vee-validate'
-import { computed, onMounted, ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { z } from 'zod'
 import { customizeLabel, disableAutoComplete, init, schema } from './common'
@@ -25,13 +24,6 @@ const fieldConfig = computed(() =>
 
 const form = useForm({ validationSchema: toTypedSchema(schema) })
 
-const profiles = ref(Array.of<Profile>())
-onMounted(() => {
-  ky('api/profiles')
-    .json<Profile[]>()
-    .then((value) => (profiles.value = value))
-})
-
 function generate() {
   form.setValues(
     {
@@ -40,9 +32,7 @@ function generate() {
       flow: 'xtls-rprx-vision',
       security: 'auto',
       date: new Date(
-        Temporal.Now.zonedDateTimeISO().add({
-          months: 1,
-        }).epochMilliseconds,
+        Temporal.Now.zonedDateTimeISO().add({ months: 1 }).epochMilliseconds,
       ),
     },
     false,
