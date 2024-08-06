@@ -31,7 +31,7 @@ const { data: pagination } = useSWRV<Pagination<User>>(
 
 const isPaid = (user: User) =>
   Temporal.ZonedDateTime.compare(
-    user.nextDate,
+    user.startDate.add({ months: user.cycles }),
     Temporal.Now.zonedDateTimeISO(),
   ) !== -1
 </script>

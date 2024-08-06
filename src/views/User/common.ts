@@ -8,7 +8,7 @@ export const schema = z.object({
   uuid: z.string().uuid(),
   flow: z.string().min(1),
   security: z.string().min(1),
-  date: z.coerce.date(),
+  cycles: z.coerce.number().nonnegative().describe('Cycles (month)'),
 })
 
 export type Key = keyof z.infer<typeof schema>
@@ -17,11 +17,7 @@ export type FieldConfig = [Key, ConfigItem]
 export const init = (key: Key): [Key, ConfigItem] => [key, {}]
 
 export function customizeLabel([key, value]: FieldConfig): FieldConfig {
-  const labelMap = {
-    [key]: undefined,
-    uuid: 'UUID',
-    date: 'Next Billing Date',
-  }
+  const labelMap = { [key]: undefined, uuid: 'UUID' }
   return [key, { ...value, label: labelMap[key] }]
 }
 

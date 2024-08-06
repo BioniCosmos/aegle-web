@@ -5,7 +5,6 @@ export interface User {
   level: number
   startDate: Temporal.ZonedDateTime
   cycles: number
-  nextDate: Temporal.ZonedDateTime
   uuid: string
   flow: string
   security: string

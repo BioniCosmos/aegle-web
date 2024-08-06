@@ -7,7 +7,6 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useForm, type GenericObject } from 'vee-validate'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { z } from 'zod'
 import { customizeLabel, disableAutoComplete, init, schema } from './common'
 
 const router = useRouter()
@@ -31,32 +30,18 @@ function generate() {
       uuid: crypto.randomUUID(),
       flow: 'xtls-rprx-vision',
       security: 'auto',
-      date: new Date(
-        Temporal.Now.zonedDateTimeISO().add({ months: 1 }).epochMilliseconds,
-      ),
     },
     false,
   )
 }
 
 function submit(event: GenericObject) {
-  const { date, ...fields } = event as z.infer<typeof schema>
-  const nextDate = dateToZonedDateTime(date)
-  const startDate = nextDate.subtract({ months: 1 })
   return ky
     .post('api/user', {
-      json: { ...fields, startDate, cycles: 1, nextDate },
+      json: { ...event, startDate: Temporal.Now.zonedDateTimeISO() },
     })
     .json<{ id: string }>()
     .then(({ id }) => router.push(`/user/${id}`))
-}
-
-function dateToZonedDateTime(date: Date) {
-  const now = Temporal.Now
-  return date
-    .toTemporalInstant()
-    .toZonedDateTimeISO(now.timeZoneId())
-    .withPlainTime(now.plainTimeISO())
 }
 </script>
 

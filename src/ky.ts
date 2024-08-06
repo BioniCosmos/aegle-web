@@ -7,9 +7,6 @@ const ky = _ky.create({
       if (key.endsWith('Date')) {
         return Temporal.ZonedDateTime.from(value)
       }
-      if (key === 'expire') {
-        return Temporal.Instant.from(value)
-      }
       return value
     }),
 })

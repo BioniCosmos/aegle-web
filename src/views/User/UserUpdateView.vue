@@ -78,12 +78,7 @@ onMounted(() => {
 const { data: user, mutate } = useSWRV<User>(`api/user/${props.id}`, fetcher)
 watch(user, (user) => {
   if (user !== undefined) {
-    form.resetForm({
-      values: {
-        ...user,
-        date: new Date(user.nextDate.epochMilliseconds),
-      },
-    })
+    form.resetForm({ values: user })
   }
 })
 
@@ -99,15 +94,8 @@ function extend() {
     return
   }
   extending.value = true
-  const { startDate, cycles } = user.value
   return ky
-    .put('api/user', {
-      json: {
-        id: props.id,
-        cycles: cycles + 1,
-        nextDate: startDate.add({ months: cycles + 1 }),
-      },
-    })
+    .put('api/user', { json: { id: props.id, cycles: user.value.cycles + 1 } })
     .then(() => mutate())
     .then(() => (extending.value = false))
 }
@@ -177,8 +165,7 @@ const isChecked = (profileName: string) =>
         :schema="schema"
         :field-config="fieldConfig"
         :form="form"
-      >
-      </AutoForm>
+      />
       <div class="mt-8 space-y-4">
         <h4 class="scroll-m-20 text-xl font-semibold tracking-tight mb-5">
           Profiles
