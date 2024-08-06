@@ -57,7 +57,9 @@ const submit = (event: GenericObject) =>
           :field-config="{
             email: { inputProps: { autocomplete: 'email' } },
             name: { inputProps: { autocomplete: 'username' } },
-            password: { inputProps: { autocomplete: 'new-password' } },
+            password: {
+              inputProps: { autocomplete: 'new-password', type: 'password' },
+            },
           }"
           @submit="submit"
           v-slot="{ submitting }"
