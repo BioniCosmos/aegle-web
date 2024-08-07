@@ -9,7 +9,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 import ky from '@/ky'
 import { account, refreshAccount } from '@/type/account'
 import { CircleUser, Menu } from 'lucide-vue-next'
@@ -73,21 +78,27 @@ const signOut = () =>
               <Package2 class="h-6 w-6" />
               <span class="sr-only">Acme Inc</span>
             </a> -->
-            <RouterLink to="/" class="hover:text-foreground">
-              Dashboard
-            </RouterLink>
-            <RouterLink
-              to="/nodes"
-              class="text-muted-foreground hover:text-foreground"
-            >
-              Nodes
-            </RouterLink>
-            <RouterLink
-              to="/users"
-              class="text-muted-foreground hover:text-foreground"
-            >
-              Users
-            </RouterLink>
+            <SheetClose as-child>
+              <RouterLink to="/" class="hover:text-foreground">
+                Dashboard
+              </RouterLink>
+            </SheetClose>
+            <SheetClose as-child>
+              <RouterLink
+                to="/nodes"
+                class="text-muted-foreground hover:text-foreground"
+              >
+                Nodes
+              </RouterLink>
+            </SheetClose>
+            <SheetClose as-child>
+              <RouterLink
+                to="/users"
+                class="text-muted-foreground hover:text-foreground"
+              >
+                Users
+              </RouterLink>
+            </SheetClose>
           </nav>
         </SheetContent>
       </Sheet>

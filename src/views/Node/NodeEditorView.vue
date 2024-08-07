@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Drawer,
+  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerFooter,
@@ -30,16 +31,11 @@ const isUpdate = computed(() => id.value !== '')
 
 const isDesktop = useMediaQuery('(min-width: 768px)')
 function toProfileEditor() {
-  closeDrawer()
   router.push(`/profile?nodeId=${id.value}`)
 }
 
-const drawerOpen = ref(false)
-const closeDrawer = () => (drawerOpen.value = false)
-
 const dialogOpen = ref(false)
 function openDialog() {
-  closeDrawer()
   dialogOpen.value = true
 }
 const closeDialog = () => (dialogOpen.value = false)
@@ -82,7 +78,7 @@ const deleteNode = () =>
             Remove the node
           </Button>
         </div>
-        <Drawer v-else v-model:open="drawerOpen">
+        <Drawer v-else>
           <DrawerTrigger as-child>
             <Button variant="outline" size="icon" class="shrink-0">
               <Menu class="h-5 w-5" />
@@ -96,10 +92,14 @@ const deleteNode = () =>
               </DrawerHeader>
             </VisuallyHidden>
             <DrawerFooter>
-              <Button @click="toProfileEditor">Add a profile</Button>
-              <Button variant="secondary" @click="openDialog">
-                Remove the node
-              </Button>
+              <DrawerClose as-child>
+                <Button @click="toProfileEditor">Add a profile</Button>
+              </DrawerClose>
+              <DrawerClose as-child>
+                <Button variant="secondary" @click="openDialog">
+                  Remove the node
+                </Button>
+              </DrawerClose>
             </DrawerFooter>
           </DrawerContent>
         </Drawer>

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Drawer,
+  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerFooter,
@@ -38,17 +39,9 @@ const props = defineProps<{ id: string }>()
 
 const isDesktop = useMediaQuery('(min-width: 768px)')
 
-const drawerOpen = ref(false)
-const closeDrawer = () => (drawerOpen.value = false)
-
 const dialogOpen = ref(false)
 function openDialog() {
-  closeDrawer()
   dialogOpen.value = true
-}
-
-function viewSubscriptionLinks() {
-  open(`/api/user/profiles?id=${props.id}`)
 }
 
 const fieldConfig = computed(() => {
@@ -128,15 +121,17 @@ const isChecked = (profileName: string) =>
     <CardHeader class="flex-row items-center justify-between">
       <CardTitle>User</CardTitle>
       <div v-if="isDesktop" class="space-x-4">
-        <Button size="sm" @click="viewSubscriptionLinks">
-          Subscription links
+        <Button size="sm" as-child>
+          <a :href="`/api/user/profiles?id=${id}`" target="_blank">
+            Subscription link
+          </a>
         </Button>
         <Button size="sm" @click="extend" :disabled="extending">Extend</Button>
         <Button size="sm" variant="secondary" @click="openDialog">
           Remove the user
         </Button>
       </div>
-      <Drawer v-else v-model:open="drawerOpen">
+      <Drawer v-else>
         <DrawerTrigger as-child>
           <Button variant="outline" size="icon" class="shrink-0">
             <Menu class="h-5 w-5" />
@@ -150,11 +145,21 @@ const isChecked = (profileName: string) =>
             </DrawerHeader>
           </VisuallyHidden>
           <DrawerFooter>
-            <Button @click="viewSubscriptionLinks">Subscription link</Button>
-            <Button @click="extend" :disabled="extending">Extend</Button>
-            <Button variant="secondary" @click="openDialog">
-              Remove the user
-            </Button>
+            <DrawerClose as-child>
+              <Button as-child>
+                <a :href="`/api/user/profiles?id=${id}`" target="_blank">
+                  Subscription link
+                </a>
+              </Button>
+            </DrawerClose>
+            <DrawerClose as-child>
+              <Button @click="extend" :disabled="extending">Extend</Button>
+            </DrawerClose>
+            <DrawerClose as-child>
+              <Button variant="secondary" @click="openDialog">
+                Remove the user
+              </Button>
+            </DrawerClose>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
