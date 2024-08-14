@@ -14,6 +14,7 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer'
 import { Label } from '@/components/ui/label'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Switch } from '@/components/ui/switch'
 import ky, { fetcher } from '@/ky'
 import type { Profile } from '@/type/profile'
@@ -61,7 +62,7 @@ const fieldConfig = computed(() => {
 
 const form = useForm({ validationSchema: toTypedSchema(schema) })
 
-const profiles = ref(Array.of<Profile>())
+const profiles = ref<Profile[]>()
 onMounted(() => {
   ky('api/profiles')
     .json<Profile[]>()
@@ -175,18 +176,26 @@ const isChecked = (profileName: string) =>
         <h4 class="scroll-m-20 text-xl font-semibold tracking-tight mb-5">
           Profiles
         </h4>
-        <div
-          class="flex items-center space-x-2"
-          v-for="profile in profiles"
-          :key="profile.name"
-        >
-          <Switch
-            :id="profile.name"
-            :checked="isChecked(profile.name)"
-            @update:checked="(checked) => update(profile.name, checked)"
-            :disabled="updating"
-          />
-          <Label :for="profile.name">{{ profile.name }}</Label>
+        <template v-if="profiles !== undefined">
+          <template v-if="profiles.length !== 0">
+            <div
+              class="flex items-center space-x-2"
+              v-for="profile in profiles"
+              :key="profile.name"
+            >
+              <Switch
+                :id="profile.name"
+                :checked="isChecked(profile.name)"
+                @update:checked="(checked) => update(profile.name, checked)"
+                :disabled="updating"
+              />
+              <Label :for="profile.name">{{ profile.name }}</Label>
+            </div>
+          </template>
+          <div v-else class="text-muted-foreground">Nothing here</div>
+        </template>
+        <div v-else class="flex items-center space-x-2" v-for="i in 5" :key="i">
+          <Skeleton class="w-32 h-6" />
         </div>
       </div>
     </CardContent>
